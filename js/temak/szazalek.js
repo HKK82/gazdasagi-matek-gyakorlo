@@ -59,12 +59,14 @@ function ujErtekTipus(irany) {
     const P1 = ujErtek(P0, p, irany);
     if (!szep(P1, 2)) return null;
     const valt = tisztit((P0 * p) / 100);
+    const szazalekos = irany > 0 ? 100 + p : 100 - p;
     return {
       szoveg: irany > 0
         ? `Egy ${t.nev} ára ${fe(P0, t.e)} volt, az árát ${f(p)} %-kal emelték. Mennyi az új ár?`
         : `Egy ${t.nev} ára ${fe(P0, t.e)} volt, az árát ${f(p)} %-kal csökkentették. Mennyi az új ár?`,
       mezok: [szamMezo({
         cimke: 'Új ár (P₁)', helyes: P1, tizedes: 2, egyseg: t.e,
+        ellenproba: (w) => `Ellenpróba: ha az új ár ${fe(w, t.e)} lenne, akkor visszaszámolva ${f(w)} : ${f(q, 4)} = ${f(w / q)} ${t.e} jönne ki régi árnak – de a régi ár ${fe(P0, t.e)} volt.`,
         hibak: [{
           ertek: valt,
           uzenet: irany > 0
@@ -78,14 +80,23 @@ function ujErtekTipus(irany) {
         }],
       })],
       tippek: [
-        `Ki a 100 %? A régi ár: P₀ = ${fe(P0, t.e)}.`,
-        'Új értéket keres → szorzás: P₁ = P₀ · q.',
+        'Ki a 100 %? Melyik szám az, amihez a százalékot viszonyítjuk – és új vagy régi értéket keresünk?',
+        `Új értéket keres → szorzás: P₁ = P₀ · q. A 100 % a régi ár: P₀ = ${fe(P0, t.e)}.`,
         `${qKeplet(p, irany)}, tehát P₁ = ${f(P0)} · ${f(q, 4)}.`,
       ],
       megoldas: [
         `Ki a 100 %? A régi ár: P₀ = ${fe(P0, t.e)}.`,
         `${irany > 0 ? 'Növekedés' : 'Csökkenés'} ${f(p)} %-kal → ${qKeplet(p, irany)}.`,
         `Új értéket keresünk → szorzás: P₁ = P₀ · q = ${f(P0)} · ${f(q, 4)} = <strong>${fe(P1, t.e)}</strong>.`,
+      ],
+      magyarazat: [
+        `Az új árat keressük. A régi ár, ${fe(P0, t.e)}, a 100 % – ehhez viszonyítjuk ${az(p)} %-os ${irany > 0 ? 'emelést' : 'csökkentést'}.`,
+        irany > 0
+          ? `Az emelés után nemcsak a régi árat fizetjük, hanem még a ${f(p)} %-át is: összesen a régi ár ${f(100 + p)} %-át (100 % + ${f(p)} %).`
+          : `A csökkentés után a régi árnak már csak egy részét fizetjük: a ${f(p)} %-ot elvesszük a 100 %-ból, így a régi ár ${f(100 - p)} %-a marad (100 % − ${f(p)} %).`,
+        `Képzelje el, hogy a régi ár 100 ${t.e} volt: akkor most ${f(szazalekos)} ${t.e}-t fizetnénk. Minden 100 ${t.e}-ból tehát ${f(szazalekos)} ${t.e} lesz, vagyis az ár ${f(q, 4)}-szorosára változik – ez a szorzó (q).`,
+        `Új értéket keresünk, ezért szorzunk: ${f(P0)} · ${f(q, 4)} = ${f(P1)} ${t.e}. Egy lépésben megkapjuk a végeredményt – nem kell külön kiszámolni, hogy mennyi az ${irany > 0 ? 'emelés' : 'csökkentés'} (${f(valt)} ${t.e}).`,
+        `Józan ésszel: ${irany > 0 ? 'emelés után drágább' : 'csökkentés után olcsóbb'} lett az áru, és a ${f(P1)} ${t.e} valóban ${irany > 0 ? 'több' : 'kevesebb'}, mint a ${f(P0)} ${t.e}. Visszaszámolva: ${f(P1)} : ${f(q, 4)} = ${f(P0)} ✓.`,
       ],
       jegyezze: 'Új értéket keres → szorzás: P₁ = P₀ · q, egy lépésben (nem kell külön kiszámolni a változást).',
     };
@@ -102,12 +113,15 @@ function regiErtekTipus(irany) {
     const P1 = ujErtek(P0, p, irany);
     if (!szep(P1, 2)) return null;
     const szaz = irany > 0 ? `(100 + ${f(p)}) % = ${f(100 + p)} %` : `(100 − ${f(p)}) % = ${f(100 - p)} %`;
+    const szazErtek = irany > 0 ? 100 + p : 100 - p;
+    const valtSzo = irany > 0 ? 'emelés' : 'engedmény';
     return {
       szoveg: irany > 0
         ? `Egy ${t.nev} árát ${f(p)} %-kal emelték, így most ${fe(P1, t.e)}. Mennyi volt az eredeti ára?`
         : `Egy ${t.nev} ára ${f(p)} %-os árengedmény után ${fe(P1, t.e)}. Mennyi volt az eredeti ára?`,
       mezok: [szamMezo({
         cimke: 'Eredeti ár (P₀)', helyes: P0, tizedes: 2, egyseg: t.e,
+        ellenproba: (w) => `Ellenpróba: ha az eredeti ár ${fe(w, t.e)} lett volna, ${az(p)} %-os ${valtSzo} után ${f(w)} · ${f(q, 4)} = ${f(w * q)} ${t.e} lenne, nem ${fe(P1, t.e)}.`,
         hibak: [{
           ertek: ujErtek(P1, p, -irany),
           uzenet: irany > 0
@@ -119,8 +133,8 @@ function regiErtekTipus(irany) {
         }],
       })],
       tippek: [
-        `Ki a 100 %? Az eredeti ár (P₀) – ezt keressük. A megadott ${fe(P1, t.e)} a ${szaz}.`,
-        'Régi értéket keres → osztás: P₀ · q = P₁, ezért P₀ = P₁ : q.',
+        'Ki a 100 %? A megadott ár a 100 %, vagy annak csak egy része?',
+        `Az eredeti ár (P₀) a 100 %, a megadott ${fe(P1, t.e)} a ${szaz}. Régi értéket keres → osztás: P₀ · q = P₁, ezért P₀ = P₁ : q.`,
         `${qKeplet(p, irany)}, tehát P₀ = ${f(P1)} : ${f(q, 4)}.`,
       ],
       megoldas: [
@@ -128,6 +142,12 @@ function regiErtekTipus(irany) {
         `P₀ · q = P₁ → P₀ = P₁ : q (az ellenkező művelet: osztás).`,
         `P₀ = ${f(P1)} : ${f(q, 4)} = <strong>${fe(P0, t.e)}</strong>.`,
         `Ellenőrzés: ${f(P0)} · ${f(q, 4)} = ${f(P1)} ✓`,
+      ],
+      magyarazat: [
+        `A régi, eredeti árat keressük – ez a 100 %. ${irany > 0 ? `Az emelés után nem a régi árat fizetjük, hanem annak a ${f(szazErtek)} %-át (100 % + ${f(p)} %)` : `Az engedmény után nem a teljes árat fizetjük, hanem annak csak a ${f(szazErtek)} %-át (100 % − ${f(p)} %)`}.`,
+        `Képzelje el, hogy a régi ár 100 ${t.e} volt: akkor most ${f(szazErtek)} ${t.e}-t fizetnénk. A ${f(szazErtek)} ${t.e} tehát mindig ${irany > 0 ? 'több' : 'kevesebb'}, mint a régi ár.`,
+        `Ezt tudjuk: a régi ár ${f(szazErtek)} %-a = ${f(P1)} ${t.e}. Ha a ${f(szazErtek)} %-ból akarunk visszajutni a 100 %-hoz, <strong>osztunk</strong> a szorzóval (${f(q, 4)}): ${f(P1)} : ${f(q, 4)} = ${f(P0)} ${t.e}.`,
+        `Józan ésszel: ${irany > 0 ? 'emelés előtt olcsóbb' : 'engedmény előtt drágább'} volt, és a ${f(P0)} ${t.e} valóban ${irany > 0 ? 'kevesebb' : 'több'}, mint a ${f(P1)} ${t.e}. Visszaszámolva: ${f(P0)} · ${f(q, 4)} = ${f(P1)} ✓.`,
       ],
       jegyezze: 'Régi (eredeti) értéket keres → osztás: P₀ = P₁ : q. A megadott új érték nem a 100 %.',
     };
@@ -150,6 +170,7 @@ function valtozasTipus(irany) {
         cimke: irany > 0 ? 'Növekedés (%)' : 'Csökkenés (%)', helyes: p, tizedes: 1, egyseg: '%',
         elojel: irany > 0 ? 'sima' : 'nagysag',
         elojelUzenet: `Elfogadva. A csökkenés mértéke ${f(p)} %; a kérdés „mennyivel csökkent”, ezért elég ${az(p)}.`,
+        ellenproba: (w) => `Ellenpróba: ha az ár ${f(w)} %-kal ${novSzo(irany)} volna, akkor ${f(P0)} · ${f(szorzo(w, irany), 4)} = ${f(ujErtek(P0, w, irany))} ${t.e} lenne az új ár, nem ${fe(P1, t.e)}.`,
         hibak: [irany > 0
           ? { ertek: tisztit(q * 100), uzenet: `Ez azt mutatja, hogy az új ár a régi hány százaléka (${f(q * 100)} %). A változás ennél 100-zal kevesebb.` }
           : { ertek: tisztit(q * 100), uzenet: `Ez azt mutatja, hány százaléka maradt meg a régi árnak (${f(q * 100)} %); a kérdés az, hány százalékkal csökkent: 100 − ${f(q * 100)}.` },
@@ -158,8 +179,8 @@ function valtozasTipus(irany) {
         { ertek: tisztit(Math.abs(P1 - P0)), uzenet: 'Ez a változás összege pénzben, nem százalékban. Számolja ki a szorzót: q = P₁ : P₀.' }],
       })],
       tippek: [
-        `Ki a 100 %? A régi ár, P₀ = ${fe(P0, t.e)} – ez kerül a nevezőbe.`,
-        'Először a szorzó: q = P₁ : P₀, utána a változás: ' + (irany > 0 ? '(q − 1) · 100.' : '(1 − q) · 100.'),
+        'Ki a 100 %? Melyik ár kerül a törtben a nevezőbe – a régi vagy az új?',
+        `A régi ár, P₀ = ${fe(P0, t.e)} a 100 % – ez kerül a nevezőbe. Először a szorzó: q = P₁ : P₀, utána a változás: ` + (irany > 0 ? '(q − 1) · 100.' : '(1 − q) · 100.'),
         `q = ${f(P1)} : ${f(P0)} = ${f(q, 4)}.`,
       ],
       megoldas: [
@@ -168,6 +189,13 @@ function valtozasTipus(irany) {
         irany > 0
           ? `(q − 1) · 100 = (${f(q, 4)} − 1) · 100 = <strong>${f(p)}</strong> → ${f(p)} %-kal nőtt.`
           : `(1 − q) · 100 = (1 − ${f(q, 4)}) · 100 = <strong>${f(p)}</strong> → ${f(p)} %-kal csökkent.`,
+      ],
+      magyarazat: [
+        `Azt keressük, hány százalékkal ${novSzo(irany)} az ár. A százalék mindig valamihez viszonyít: itt a régi árhoz, a ${f(P0)} ${t.e}-hoz – ez a 100 %.`,
+        `Megnézzük, hányszorosa az új ár a réginek: ${f(P1)} : ${f(P0)} = ${f(q, 4)}. Ez azt jelenti, hogy az új ár a régi ${f(q * 100)} %-a.`,
+        `Képzelje el, hogy a régi ár 100 ${t.e} volt: akkor az új ár ${f(q * 100)} ${t.e} lenne. A 100-hoz képest ez ${f(p)} egységgel ${irany > 0 ? 'több' : 'kevesebb'}, ezért a változás ${f(p)} %.`,
+        `Osztunk, mert a két ár arányát keressük, és a régi ár kerül lent (a nevezőbe), mint a ház alapja. Utána ${irany > 0 ? 'kivonunk 1-et (a 100 %-ot)' : 'az 1-ből vonjuk ki a hányadost'}, mert csak a változásra vagyunk kíváncsiak, nem arra, hogy hány százaléka az új ár a réginek.`,
+        `Józan ésszel: az ár ${irany > 0 ? 'nőtt' : 'csökkent'}, ezért a ${f(q * 100)} % ${irany > 0 ? 'nagyobb' : 'kisebb'}, mint 100, és a változás ${f(p)} %. Visszaszámolva: ${f(P0)} · ${f(q, 4)} = ${f(P1)} ✓.`,
       ],
       jegyezze: '„Hány százaléka” ≠ „hány százalékkal változott”: q = P₁ : P₀, a változás (q − 1) · 100.',
     };
@@ -202,48 +230,69 @@ function ketValtozasTipus(fajta) {
     const q = tisztit(q1 * q2);
     const valt = osszetett([i1 * p1, i2 * p2]);
     if (Math.abs(valt) < 0.5) return null;
-    let szoveg, mezo, utolso, jegyezze;
+    let szoveg, mezo, utolso, jegyezze, nevek;
+    const szaz = `100 · ${f(q1, 4)} · ${f(q2, 4)} = ${f(q * 100, 2)}`;
+    // ellenpróba: 100-ból indulva a két lépés tényleges eredménye vs. a hallgató összesített százaléka
+    const ellen = (w) => {
+      const vegso = fajta === 'csokk' ? `${f(-valt)} %-kal kevesebb` : `${f(Math.abs(valt))} %-kal ${valt < 0 ? 'kevesebb' : 'több'}`;
+      const sajat = fajta === 'csokk' ? 100 - w : 100 + w;
+      return `Ellenpróba: 100-ból indulva a két változás után ${szaz} lesz, vagyis ${vegso}. Ha a teljes változás ${f(w)} % lenne, a végeredmény ${f(sajat, 2)} lenne, nem ${f(q * 100, 2)}.`;
+    };
     if (fajta === 'nov') {
       szoveg = valaszt(rng, SZOVEG_NOV)(p1, p2) + ' Összesen hány százalékkal nőtt a két változás alatt?';
       mezo = szamMezo({
-        cimke: 'Összes növekedés (%)', helyes: valt, tizedes: 1, egyseg: '%',
+        cimke: 'Összes növekedés (%)', helyes: valt, tizedes: 1, egyseg: '%', ellenproba: ellen,
         hibak: [{ ertek: p1 + p2, uzenet: 'A százalékokat nem adjuk össze, a szorzókat szorozzuk: q = q₁ · q₂.' },
           { ertek: tisztit(q * 100), uzenet: `Ez azt mutatja, hogy a végén az eredeti ${f(q * 100)} %-a lett; a növekedés ennél 100-zal kevesebb.` }],
       });
       utolso = `(q − 1) · 100 = (${f(q, 4)} − 1) · 100 = <strong>${f(valt)}</strong> → összesen ${f(valt)} %-kal nőtt.`;
       jegyezze = 'Többszöri változásnál a szorzókat összeszorozzuk, a százalékokat nem adjuk össze.';
+      nevek = ['növekedés', 'növekedés'];
     } else if (fajta === 'csokk') {
       szoveg = valaszt(rng, SZOVEG_CSOKK)(p1, p2) + ' Összesen hány százalékkal csökkent?';
       mezo = szamMezo({
-        cimke: 'Összes csökkenés (%)', helyes: -valt, tizedes: 1, egyseg: '%', elojel: 'nagysag',
+        cimke: 'Összes csökkenés (%)', helyes: -valt, tizedes: 1, egyseg: '%', elojel: 'nagysag', ellenproba: ellen,
         elojelUzenet: `Elfogadva. A csökkenés mértéke ${f(-valt)} %; a kérdés „mennyivel csökkent”, ezért elég ${az(-valt)}.`,
         hibak: [{ ertek: p1 + p2, uzenet: 'A százalékokat nem adjuk össze, a szorzókat szorozzuk: q = q₁ · q₂. A második csökkenés már a kisebb árból számolódik.' },
           { ertek: tisztit(q * 100), uzenet: `Ez azt mutatja, hány százaléka maradt meg (${f(q * 100)} %); a kérdés az, hány százalékkal csökkent.` }],
       });
       utolso = `(1 − q) · 100 = (1 − ${f(q, 4)}) · 100 = <strong>${f(-valt)}</strong> → összesen ${f(-valt)} %-kal csökkent.`;
       jegyezze = 'Két csökkenés után is a szorzókat szorozzuk; az összes csökkenés kevesebb, mint a két százalék összege.';
+      nevek = ['csökkenés', 'csökkenés'];
     } else {
       szoveg = valaszt(rng, SZOVEG_VEGYES)(p1, p2) +
         ' Hány százalékos a teljes változás? (Előjellel adja meg: csökkenésnél negatív szám, pl. −4.)';
       mezo = szamMezo({
-        cimke: 'Teljes változás (%), előjellel', helyes: valt, tizedes: 1, egyseg: '%', elojel: 'elojeles',
+        cimke: 'Teljes változás (%), előjellel', helyes: valt, tizedes: 1, egyseg: '%', elojel: 'elojeles', ellenproba: ellen,
         hibak: [{ ertek: p1 - p2, uzenet: `A százalékokat nem lehet egyszerűen összevonni (${p1} − ${p2}). Például +20 % majd −20 % nem 0 %, hanem 1,2 · 0,8 = 0,96 → −4 %. Szorozza a szorzókat!` }],
       });
       utolso = `(q − 1) · 100 = (${f(q, 4)} − 1) · 100 = <strong>${f(valt)}</strong> → a teljes változás ${f(valt)} % (${valt < 0 ? 'csökkenés' : 'növekedés'}).`;
       jegyezze = 'Egy növekedés és egy ugyanakkora csökkenés nem oltja ki egymást: a szorzókat szorozzuk (1,2 · 0,8 = 0,96).';
+      nevek = ['növekedés', 'csökkenés'];
     }
+    const lepes1 = `Az első lépés ${p1} %-os ${nevek[0]}: a 100-ból ${f(100 * q1, 2)} lesz (szorzó: ${f(q1, 4)}).`;
+    const lepes2 = `A második lépés ${p2} %-os ${nevek[1]}, de már az új értékre vonatkozik, nem a 100-ra: ${f(100 * q1, 2)} · ${f(q2, 4)} = ${f(100 * q, 2)}.`;
     return {
       szoveg,
       mezok: [mezo],
       tippek: [
-        'Írja fel mindkét változás szorzóját (növekedés: 1 + p/100, csökkenés: 1 − p/100).',
-        'A kiinduló érték mindegy – számoljon 100-ból, és a szorzókat szorozza össze: q = q₁ · q₂.',
+        'Mivel kell megszorozni a kiinduló értéket az első változásnál, és mivel a másodiknál?',
+        'Írja fel mindkét változás szorzóját (növekedés: 1 + p/100, csökkenés: 1 − p/100). A kiinduló érték mindegy – számoljon 100-ból.',
         `q = ${f(q1, 4)} · ${f(q2, 4)} = ${f(q, 4)}.`,
       ],
       megoldas: [
         `Szorzók: q₁ = ${f(q1, 4)}, q₂ = ${f(q2, 4)}.`,
         `q = q₁ · q₂ = ${f(q1, 4)} · ${f(q2, 4)} = ${f(q, 4)} (100-ból számolva: 100 · ${f(q, 4)} = ${f(q * 100)}).`,
         utolso,
+      ],
+      magyarazat: [
+        `Azt keressük, mennyi a teljes változás a két lépés után. A kiinduló érték nem számít, ezért számoljunk 100-ból.`,
+        lepes1,
+        lepes2,
+        `Miért szorzunk? Mert a második változás már az első után kialakult értékre vonatkozik – ezért nem adhatjuk össze a ${p1} %-ot és a ${p2} %-ot, hanem a két szorzót szorozzuk: ${f(q1, 4)} · ${f(q2, 4)} = ${f(q, 4)}.`,
+        fajta === 'vegyes'
+          ? `Józan ésszel: 100-ból ${f(q * 100, 2)} lett, vagyis a teljes változás ${f(valt)} %. A ${p1} − ${p2} = ${f(p1 - p2)} % hibás lenne, mert a két százalék nem ugyanarra az alapra vonatkozik.`
+          : `Józan ésszel: 100-ból ${f(q * 100, 2)} lett, vagyis ${f(Math.abs(valt))} %-kal ${fajta === 'nov' ? 'nőtt' : 'csökkent'} az érték. Ez ${fajta === 'nov' ? 'több' : 'kevesebb'}, mint a két százalék összege (${p1 + p2} %), mert a második változás már a megváltozott értékre vonatkozik.`,
       ],
       jegyezze,
     };
@@ -275,26 +324,38 @@ function szallodaTipus(rng) {
       tablazat: true,
       mezok: [
         szamMezo({ id: 'N0', cimke: 'Összes vendég 2023-ban (fő)', helyes: c.N0, tizedes: 0, egyseg: 'fő',
+          ellenproba: (w) => `Ellenpróba: ha 2023-ban összesen ${f(w)} vendég lett volna, a ${f(s)} %-uk ${f((w * s) / 100)} belföldi lenne, nem ${f(D0)}.`,
           hibak: [{ ertek: (D0 * s) / 100, uzenet: `${Az(D0)} belföldi vendég nem a 100 %, hanem ${az(s)} %. Az összes vendég a 100 % → osztás: ${f(D0)} : ${f(s / 100)}.` }] }),
-        szamMezo({ id: 'K0', cimke: 'Külföldi vendég 2023-ban (fő)', helyes: c.K0, tizedes: 0, egyseg: 'fő' }),
+        szamMezo({ id: 'K0', cimke: 'Külföldi vendég 2023-ban (fő)', helyes: c.K0, tizedes: 0, egyseg: 'fő',
+          ellenproba: (w) => `Ellenpróba: ha ${f(w)} külföldi vendég volt, az összes vendég ${f(w)} + ${f(D0)} = ${f(w + D0)} lenne, és a belföldiek aránya ${f((D0 / (w + D0)) * 100, 1)} % – a feladat szerint ${f(s)} %.`,
+          hibak: [{ ertek: D0, uzenet: 'Ez a belföldi vendégek száma. A külföldiek = összes vendég − belföldi vendég.' }] }),
         szamMezo({ id: 'D1', cimke: 'Belföldi vendég 2024-ben (fő)', helyes: c.D1, tizedes: 0, egyseg: 'fő',
+          ellenproba: (w) => `Ellenpróba: ${f(D0)} → ${f(w)} vendég ${f(valtozas(D0, w), 1)} %-os változás lenne; a feladat szerint ${f(d)} %-kal kevesebb jött: ${f(D0)} · ${f(szorzo(d, -1), 4)} = ${f(c.D1)}.`,
           hibak: [{ ertek: (D0 * d) / 100, uzenet: 'Ez csak a csökkenés; a 2024-es érték: régi · q (q = 1 − p/100).' }] }),
         szamMezo({ id: 'K1', cimke: 'Külföldi vendég 2024-ben (fő)', helyes: c.K1, tizedes: 0, egyseg: 'fő',
+          ellenproba: (w) => `Ellenpróba: ${f(c.K0)} → ${f(w)} vendég ${f(valtozas(c.K0, w), 1)} %-os változás lenne; a feladat szerint ${f(fk)} %-kal több jött: ${f(c.K0)} · ${f(szorzo(fk), 4)} = ${f(c.K1)}.`,
           hibak: [{ ertek: (K0 * fk) / 100, uzenet: 'Ez csak a növekedés; a 2024-es érték: régi · q (q = 1 + p/100).' }] }),
-        szamMezo({ id: 'N1', cimke: 'Összes vendég 2024-ben (fő)', helyes: c.N1, tizedes: 0, egyseg: 'fő' }),
+        szamMezo({ id: 'N1', cimke: 'Összes vendég 2024-ben (fő)', helyes: c.N1, tizedes: 0, egyseg: 'fő',
+          ellenproba: (w) => `Ellenpróba: a két csoport együtt ${f(c.D1)} + ${f(c.K1)} = ${f(c.N1)} fő, nem ${f(w)}.`,
+          hibak: [{ ertek: tisztit(c.D1 + c.K0), uzenet: 'A külföldi vendégek 2024-es létszámát (K₁) kell hozzáadni, nem a 2023-asat.' }] }),
         szamMezo({ id: 'V', cimke: 'Az összes vendégszám változása (%), előjellel', helyes: c.V, tizedes: 1, egyseg: '%', elojel: 'elojeles',
+          ellenproba: (w) => `Ellenpróba: ha az összes vendégszám ${f(w)} %-kal változott, akkor ${f(c.N0)} · ${f(szorzo(w), 4)} = ${f(ujErtek(c.N0, w))} vendég lett volna 2024-ben, nem ${f(c.N1)}.`,
           hibak: [{ ertek: fk - d, uzenet: 'A két csoport százalékait nem vonjuk össze, mert különböző nagyságú csoportokra vonatkoznak. Hasonlítsa össze az összes vendégszámot: q = N₁ : N₀.' }] }),
         szamMezo({ id: 'R0', cimke: 'Bevétel 2023-ban (€)', helyes: c.R0, tizedes: 0, egyseg: '€',
+          ellenproba: (w) => `Ellenpróba: ha 2023-ban ${fe(w, '€')} volt a bevétel, ${az(g)} %-os növekedés után ${f(w)} · ${f(szorzo(g), 4)} = ${f(w * szorzo(g))} € lenne 2024-ben, nem ${fe(R1, '€')}.`,
           hibak: [{ ertek: ujErtek(R1, g, -1), uzenet: `A 2024-es bevétel nem a 100 %, hanem ${az(100 + g)} %. Régi értéket keres → osztás: ${f(R1)} : ${f(szorzo(g), 4)}.` }] }),
-        szamMezo({ id: 'r0', cimke: 'Egy vendégre jutó bevétel 2023-ban (€)', helyes: c.r0, tizedes: 1, egyseg: '€' }),
-        szamMezo({ id: 'r1', cimke: 'Egy vendégre jutó bevétel 2024-ben (€)', helyes: c.r1, tizedes: 1, egyseg: '€' }),
+        szamMezo({ id: 'r0', cimke: 'Egy vendégre jutó bevétel 2023-ban (€)', helyes: c.r0, tizedes: 1, egyseg: '€',
+          ellenproba: (w) => `Ellenpróba: ${f(w, 2)} € vendégenként ${f(c.N0)} vendégnél ${f(w * c.N0)} € bevétel lenne, nem ${f(c.R0)} €.` }),
+        szamMezo({ id: 'r1', cimke: 'Egy vendégre jutó bevétel 2024-ben (€)', helyes: c.r1, tizedes: 1, egyseg: '€',
+          ellenproba: (w) => `Ellenpróba: ${f(w, 2)} € vendégenként ${f(c.N1)} vendégnél ${f(w * c.N1)} € bevétel lenne, nem ${f(R1)} €.` }),
         szamMezo({ id: 'vr', cimke: 'Az egy vendégre jutó bevétel változása (%), előjellel', helyes: c.vr, tizedes: 1, egyseg: '%', elojel: 'elojeles',
           alternativ: [vrKerekbol],
+          ellenproba: (w) => `Ellenpróba: ha az egy vendégre jutó bevétel ${f(w)} %-kal változott, akkor ${f(c.r0, 2)} · ${f(szorzo(w), 4)} = ${f(c.r0 * szorzo(w), 2)} € lenne 2024-ben, nem ${f(c.r1, 2)} €.`,
           hibak: [{ ertek: g - c.V, uzenet: `A százalékokat itt sem vonjuk ki egymásból; a szorzókat osztjuk: ${f(szorzo(g), 4)} : ${f(c.N1 / c.N0, 4)}.` }] }),
       ],
       tippek: [
-        `Ki a 100 %? Az összes vendég. ${Az(D0)} belföldi ${az(s)} % → összes = ${f(D0)} : ${f(s / 100)}.`,
-        'Minden csoportnál a saját régi értéke a 100 %: új = régi · q. A bevételnél régi értéket keres → osztás.',
+        'Ki a 100 %? Melyik számból tudjuk visszaszámolni az összes vendégszámot, és hogyan?',
+        `Az összes vendég a 100 %. ${Az(D0)} belföldi ${az(s)} % → összes = ${f(D0)} : ${f(s / 100)}. Minden csoportnál a saját régi értéke a 100 %: új = régi · q. A bevételnél régi értéket keres → osztás.`,
         'Egy vendégre jutó bevétel = bevétel : vendégszám; a változás: (új : régi − 1) · 100.',
       ],
       megoldas: [
@@ -304,6 +365,14 @@ function szallodaTipus(rng) {
         `Bevétel 2023: ${f(R1)} : ${f(szorzo(g), 4)} = <strong>${fe(c.R0, '€')}</strong>.`,
         `Egy vendégre jutó bevétel: 2023: ${f(c.R0)} : ${f(c.N0)} = <strong>${fe(c.r0, '€', 1)}</strong>; 2024: ${f(R1)} : ${f(c.N1)} ≈ <strong>${fe(c.r1, '€', 1)}</strong>.`,
         `Változás: ${f(c.r1, 4)} : ${f(c.r0)} ≈ ${f(c.r1 / c.r0, 4)} → <strong>${f(c.vr, 1)} %</strong> (gyorsabban: ${f(szorzo(g), 4)} : ${f(c.N1 / c.N0, 4)}).`,
+      ],
+      magyarazat: [
+        `Több kérdést kell egymás után megválaszolni, és minden lépésnél más a 100 %. Mindig azt kérdezzük: mihez viszonyítunk?`,
+        `Az összes vendég számát keressük 2023-ban. ${Az(D0)} belföldi vendég nem az összes, hanem annak ${az(s)} %-a. Ha az összes vendég 100 lenne, ${f(s)} lenne a belföldi. Így ${az(D0)} belföldi vendég ${f(s)} %-ot jelent: összes = ${f(D0)} : ${f(s / 100)} = ${f(c.N0)}. A külföldiek a maradék: ${f(c.N0)} − ${f(D0)} = ${f(c.K0)}.`,
+        `2024-ben a két csoport külön változik, ezért külön számolunk, mindegyiknél a saját 2023-as létszám a 100 %: belföldi ${f(D0)} · ${f(szorzo(d, -1), 4)} = ${f(c.D1)}, külföldi ${f(c.K0)} · ${f(szorzo(fk), 4)} = ${f(c.K1)}. A két csoport százalékait nem vonhatjuk össze, mert különböző nagyságú csoportokra vonatkoznak. Az összes vendég: ${f(c.N1)}.`,
+        `A bevétel 2024-ben ${g} %-kal több a 2023-asnál, vagyis a 2024-es bevétel a 2023-asnak a ${f(100 + g)} %-a. Régi értéket keresünk, ezért osztunk: ${f(R1)} : ${f(szorzo(g), 4)} = ${f(c.R0)} €.`,
+        `Az egy vendégre jutó bevétel a bevétel osztva a vendégek számával: 2023-ban ${f(c.R0)} : ${f(c.N0)} = ${f(c.r0, 1)} €, 2024-ben ${f(R1)} : ${f(c.N1)} ≈ ${f(c.r1, 1)} €. A változás ennek a két számnak a hányadosa: ${f(c.r1 / c.r0, 4)}, vagyis ${f(c.vr, 1)} %.`,
+        `Józan ésszel: a vendégek száma ${c.V < 0 ? 'csökkent' : 'nőtt'}, a bevétel ${g} %-kal nőtt, ezért vendégenként ${c.vr > 0 ? 'többet' : 'kevesebbet'} költöttek (${f(c.vr, 1)} %). Gyors ellenőrzés: ${f(szorzo(g), 4)} : ${f(c.N1 / c.N0, 4)} = ${f(szorzo(g) / (c.N1 / c.N0), 4)}.`,
       ],
       jegyezze: 'Összetett feladatnál minden lépésnél kérdezze meg: ki a 100 %? Új érték → szorzás, régi érték → osztás.',
     };

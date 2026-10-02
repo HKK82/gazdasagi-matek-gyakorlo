@@ -1,6 +1,6 @@
 // Próbateszt: 10 feladat, 20 perc az egész tesztre, szabad lépkedés, beadás, eredmény + levezetés.
 import { el } from './kozos.js';
-import { mezokRajzol, abraElem } from './feladat-nezet.js';
+import { mezokRajzol, abraElem, miertElem } from './feladat-nezet.js';
 import { TEMAK } from '../temak/index.js';
 import { ujRng } from '../lib/rng.js';
 import { tesztFeladatok, TESZT_DB, TESZT_PERC } from '../lib/teszt-osszeallito.js';
@@ -20,7 +20,7 @@ function bevezeto() {
   hely.replaceChildren(el('section', { class: 'doboz' },
     el('h2', { text: 'Tudnivalók' }),
     el('ul', {},
-      el('li', { html: `<strong>${TESZT_DB} feladat</strong> a három témából, véletlen számokkal.` }),
+      el('li', { html: `<strong>${TESZT_DB} feladat</strong> a négy témából, véletlen számokkal.` }),
       el('li', { html: `Időkorlát: <strong>${TESZT_PERC} perc az egész tesztre</strong> (nem feladatonként). Az idő lejártakor a teszt automatikusan beadódik.` }),
       el('li', { text: 'A feladatok között szabadon lépkedhet a számozott gombokkal; a válaszai megmaradnak.' }),
       el('li', { text: SZAM_UTASITAS }),
@@ -168,12 +168,14 @@ function beadas(idoLejart) {
           el('dt', { text: 'Az Ön válasza:' }), el('dd', { text: allapot.valaszok[i].trim() || '(üres)' }),
           el('dt', { text: 'Helyes válasz:' }), el('dd', { text: helyesValaszSzoveg(m) })),
         e.allapot === 'tipikus' ? el('p', { class: 'vj-tipikus', text: `⚠ Tipikus hiba: ${e.uzenet}` }) : null,
+        !jo && e.ellenproba ? el('p', { class: 'ellenproba', text: e.ellenproba }) : null,
         e.allapot === 'ervenytelen' ? el('p', { class: 'vj-rossz', text: `ℹ ${e.uzenet}` }) : null,
         jo && e.allapot === 'jo-megjegyzes' ? el('p', { class: 'vj-jo', text: `✔ ${e.uzenet}` }) : null,
         el('details', {},
           el('summary', { text: 'Megoldás lépésenként' }),
           el('ol', { class: 'lepesek' }, t.feladat.megoldas.map((l) => el('li', { html: l }))),
           abraElem(t.feladat.abraMegoldas),
+          miertElem(t.feladat, true),
           el('p', { class: 'jegyezze', html: `Ezt jegyezze meg: ${t.feladat.jegyezze}` })));
     })));
   document.getElementById('eredmenyCim').setAttribute('tabindex', '-1');

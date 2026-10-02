@@ -73,19 +73,22 @@ function K1(rng) {
     if (!szep(Y, 0) || !szep(dA, 0) || !szep(dB, 0)) return null; // egész forintok
     const olcsobb = dA < dB ? t.A : t.B;
     const uz = `Helyettesítse be az x = ${f(d)} értéket mindkét függvénybe, és hasonlítsa össze a két díjat.`;
+    const ellenO = `Ellenpróba: ${f(d)} km-nél ${t.A.nev}: ${f(t.A.a)} + ${f(t.A.c)} · ${f(d)} = ${f(dA)} Ft, ${t.B.nev}: ${f(t.B.a)} + ${f(t.B.c)} · ${f(d)} = ${f(dB)} Ft – a kisebb díj a(z) ${olcsobb.nev}.`;
     return {
       szoveg: tarifaSzoveg(t),
       mezok: [
         szamMezo({ id: 'x', cimke: `A(z) ${T.nev} taxival ${fe(Y, 'Ft')}-ot fizettünk. Hány km-t utaztunk?`, helyes: x, tizedes: 2, egyseg: 'km',
+          ellenproba: (w) => `Ellenpróba: ha ${f(w)} km-t utaztunk volna, a díj ${f(T.a)} + ${f(T.c)} · ${f(w)} = ${f(T.a + T.c * w)} Ft lenne, nem ${f(Y)} Ft.`,
           hibak: [
             { ertek: tisztit(Y / T.c), uzenet: 'Előbb az alapdíjat vonja le, és csak utána osszon a kilométerdíjjal.' },
             { ertek: tisztit((Y + T.a) / T.c), uzenet: 'Rendezésnél az ellenkező műveletet végezze: az alapdíjat kivonjuk.' },
           ] }),
         valasztoMezo({ id: 'o', cimke: `Melyik társaság olcsóbb egy ${f(d)} km-es útnál?`,
-          opciok: [t.A, t.B].map((T2) => ({ szoveg: T2.nev, helyes: T2 === olcsobb, uzenet: T2 === olcsobb ? '' : uz }))
-            .concat([{ szoveg: 'egyforma a díj', helyes: false, uzenet: uz }]) }),
+          opciok: [t.A, t.B].map((T2) => ({ szoveg: T2.nev, helyes: T2 === olcsobb, uzenet: T2 === olcsobb ? '' : uz, ellenproba: T2 === olcsobb ? '' : ellenO }))
+            .concat([{ szoveg: 'egyforma a díj', helyes: false, uzenet: uz, ellenproba: ellenO }]) }),
       ],
       tippek: [
+        `Melyik betű az ismeretlen a ${T.jel}(x) = ${f(T.a)} + ${f(T.c)}x díjszabási függvényben – az x vagy az y? És mit kell összehasonlítani a b) kérdésnél?`,
         `a) ${tarifaKif(T)} = ${f(Y)} – rendezzen x-re (először az alapdíjat vonja le).`,
         `b) Számolja ki mindkét díjat x = ${f(d)} esetén: ${t.A.jel}(${f(d)}) és ${t.B.jel}(${f(d)}).`,
       ],
@@ -93,6 +96,13 @@ function K1(rng) {
         `a) ${f(T.a)} + ${f(T.c)}x = ${f(Y)} → ${f(T.c)}x = ${f(Y - T.a)} → x = <strong>${fe(x, 'km')}</strong>.`,
         `b) ${t.A.nev}: ${f(t.A.a)} + ${f(t.A.c)} · ${f(d)} = ${fe(dA, 'Ft')}; ${t.B.nev}: ${f(t.B.a)} + ${f(t.B.c)} · ${f(d)} = ${fe(dB, 'Ft')}.`,
         `${f(d)} km-nél a(z) <strong>${olcsobb.nev}</strong> olcsóbb.`,
+      ],
+      magyarazat: [
+        `Két kérdés van: a) hány kilométert utaztunk, ha a díj ${f(Y)} Ft; b) melyik társaság olcsóbb ${f(d)} km-nél.`,
+        `a) A díj két részből áll: alapdíj (${f(T.a)} Ft) + kilométerdíj (${f(T.c)} Ft kilométerenként). A kifizetett ${f(Y)} Ft-ból az alapdíjat mindenképp ki kellett fizetni, ezért levonjuk: ${f(Y)} − ${f(T.a)} = ${f(Y - T.a)} Ft maradt a kilométerekre.`,
+        `Ezt elosztjuk a kilométerdíjjal, hogy megtudjuk, hány km-re volt elég: ${f(Y - T.a)} : ${f(T.c)} = ${f(x)} km. Visszafelé haladunk, ezért az eredeti szorzás és összeadás helyett fordított sorrendben kivonás és osztás jön.`,
+        `b) Az összehasonlításhoz mindkét díjszabásba ugyanazt az x-et írjuk: ${t.A.nev}: ${f(dA)} Ft, ${t.B.nev}: ${f(dB)} Ft. Az olcsóbb az, amelyiknél kisebb a szám: ${olcsobb.nev}.`,
+        `Józan ésszel: a két egyenes ${f(t.xs)} km-nél metszi egymást; ${f(d)} km ${d < t.xs ? 'ennél rövidebb' : 'ennél hosszabb'}, és ${d < t.xs ? 'a kisebb alapdíjú társaság' : 'a kisebb kilométerdíjú társaság'} az olcsóbb – ez egyezik a kapott eredménnyel.`,
       ],
       abraMegoldas: tarifaAbra(t),
       jegyezze: 'Adott díjnál a km: rendezés (alapdíj levonása, osztás). Összehasonlításhoz mindkét függvénybe ugyanazt az x-et írjuk.',
@@ -107,18 +117,27 @@ function K2(rng) {
     szoveg: tarifaSzoveg(t) + ' Hány km-es útnál fizetünk ugyanannyit a két társaságnál, és mennyit?',
     mezok: [
       szamMezo({ id: 'x', cimke: 'Távolság (km)', helyes: t.xs, tizedes: 2, egyseg: 'km',
+        ellenproba: (w) => `Ellenpróba: ${f(w)} km-nél ${P.jel}(${f(w)}) = ${f(P.a + P.c * w)} Ft, ${Q.jel}(${f(w)}) = ${f(Q.a + Q.c * w)} Ft – a két díj nem egyforma (a különbség ${f(Math.abs(P.a + P.c * w - Q.a - Q.c * w))} Ft).`,
         hibak: [{ ertek: tisztit((t.A.a + t.B.a) / (t.B.c - t.A.c)), uzenet: 'Rendezésnél az alapdíjakat kivonjuk egymásból (ellenkező művelet), nem összeadjuk.' }] }),
-      szamMezo({ id: 'y', cimke: 'A díj ekkor (Ft)', helyes: t.ys, tizedes: 2, egyseg: 'Ft' }),
+      szamMezo({ id: 'y', cimke: 'A díj ekkor (Ft)', helyes: t.ys, tizedes: 2, egyseg: 'Ft',
+        ellenproba: (w) => `Ellenpróba: ${t.A.jel}(${f(t.xs)}) = ${f(t.A.a)} + ${f(t.A.c)} · ${f(t.xs)} = ${f(t.ys)} Ft, és ${t.B.jel}(${f(t.xs)}) is ennyi, nem ${f(w)} Ft.` }),
     ],
     tippek: [
-      'Egyforma díj → a két kifejezést egyenlővé tesszük.',
-      `${f(P.a)} + ${f(P.c)}x = ${f(Q.a)} + ${f(Q.c)}x – az x-es tagokat egy oldalra, a számokat a másikra.`,
+      'Mit mondhatunk a két díjról, ha a két társaság ugyanannyit kér? Hogyan írható ez fel egyenletként?',
+      `Egyforma díj → a két kifejezést egyenlővé tesszük: ${f(P.a)} + ${f(P.c)}x = ${f(Q.a)} + ${f(Q.c)}x – az x-es tagokat egy oldalra, a számokat a másikra.`,
       `${f(t.B.c - t.A.c)}x = ${f(t.A.a - t.B.a)}. A díjhoz az x-et bármelyik függvénybe visszaírhatja.`,
     ],
     megoldas: [
       `${f(P.a)} + ${f(P.c)}x = ${f(Q.a)} + ${f(Q.c)}x.`,
       `${f(t.B.c)}x − ${f(t.A.c)}x = ${f(t.A.a)} − ${f(t.B.a)} → ${f(t.B.c - t.A.c)}x = ${f(t.A.a - t.B.a)} → x = <strong>${fe(t.xs, 'km')}</strong>.`,
       `A díj: ${t.A.jel}(${f(t.xs)}) = ${f(t.A.a)} + ${f(t.A.c)} · ${f(t.xs)} = <strong>${fe(t.ys, 'Ft')}</strong> (ellenőrzés: ${t.B.jel}(${f(t.xs)}) = ${f(ertek(t.B.c, t.B.a, t.xs))}).`,
+    ],
+    magyarazat: [
+      'Azt keressük, hány km-nél lesz mindkét társaságnál ugyanannyi a díj. Egyforma díj → a két kifejezés egyenlő.',
+      `Felírjuk: ${f(P.a)} + ${f(P.c)}x = ${f(Q.a)} + ${f(Q.c)}x. Az egyik társaságnál nagyobb az alapdíj, a másiknál nagyobb a kilométerdíj, ezért egy bizonyos távolságnál kiegyenlítődnek.`,
+      `Az x-es tagokat az egyik oldalra, a számokat a másikra visszük az ellenkező műveletekkel: ${f(t.B.c - t.A.c)}x = ${f(t.A.a - t.B.a)}. Az alapdíjak különbsége (${f(t.A.a - t.B.a)} Ft) az, amit a kilométerdíjak különbsége (${f(t.B.c - t.A.c)} Ft kilométerenként) fokozatosan kiegyenlít.`,
+      `Ezért osztunk: ${f(t.A.a - t.B.a)} : ${f(t.B.c - t.A.c)} = ${f(t.xs)} km. A díjat úgy kapjuk, hogy az x-et visszaírjuk bármelyik képletbe: ${f(t.A.a)} + ${f(t.A.c)} · ${f(t.xs)} = ${f(t.ys)} Ft.`,
+      `Józan ésszel: a másik képletbe írva is ${f(ertek(t.B.c, t.B.a, t.xs))} Ft jön ki, vagyis a metszéspontnál tényleg egyforma a két díj ✓.`,
     ],
     abraMegoldas: tarifaAbra(t),
     jegyezze: 'Két lineáris függvény metszéspontja: a két kifejezést egyenlővé tesszük.',
@@ -129,20 +148,24 @@ function K3(rng) {
   const t = ketTarifa(rng);
   const X = valaszt(rng, [t.A, t.B]);
   const rovid = X === t.B; // a kisebb alapdíjú a rövid utaknál olcsóbb
+  const Y = X === t.A ? t.B : t.A;
+  const xTeszt = rovid ? tisztit(t.xs / 2) : tisztit(t.xs * 2);
+  const ellenK3 = `Ellenpróba: ${f(xTeszt)} km-nél ${X.nev}: ${f(X.a)} + ${f(X.c)} · ${f(xTeszt)} = ${f(ertek(X.c, X.a, xTeszt))} Ft, ${Y.nev}: ${f(Y.a)} + ${f(Y.c)} · ${f(xTeszt)} = ${f(ertek(Y.c, Y.a, xTeszt))} Ft – ${rovid ? 'rövid' : 'hosszú'} útnál a(z) ${X.nev} az olcsóbb.`;
   const uzForditott = 'Fordított irány! Nézze meg, melyik egyenes van lejjebb 0 km-nél: ott a kisebb alapdíjú az olcsóbb, és a metszéspontig az is marad.';
   return {
     szoveg: tarifaSzoveg(t) + ` Milyen hosszú utaknál olcsóbb a(z) ${X.nev}?`,
     mezok: [
-      szamMezo({ id: 'x', cimke: 'A határ (km), ahol a két díj egyforma', helyes: t.xs, tizedes: 2, egyseg: 'km' }),
+      szamMezo({ id: 'x', cimke: 'A határ (km), ahol a két díj egyforma', helyes: t.xs, tizedes: 2, egyseg: 'km',
+        ellenproba: (w) => `Ellenpróba: ${f(w)} km-nél ${t.A.jel}(${f(w)}) = ${f(t.A.a + t.A.c * w)} Ft, ${t.B.jel}(${f(w)}) = ${f(t.B.a + t.B.c * w)} Ft – ezek nem egyformák, tehát ez nem a határ.` }),
       valasztoMezo({ id: 'irany', cimke: `Mikor olcsóbb a(z) ${X.nev}?`, opciok: [
-        { szoveg: 'ha az út rövidebb a határnál (x kisebb)', helyes: rovid, uzenet: rovid ? '' : uzForditott },
-        { szoveg: 'ha az út hosszabb a határnál (x nagyobb)', helyes: !rovid, uzenet: rovid ? uzForditott : '' },
-        { szoveg: 'mindig', helyes: false, uzenet: 'A két egyenes metszi egymást, ezért a metszéspont után megfordul a sorrend.' },
+        { szoveg: 'ha az út rövidebb a határnál (x kisebb)', helyes: rovid, uzenet: rovid ? '' : uzForditott, ellenproba: rovid ? '' : ellenK3 },
+        { szoveg: 'ha az út hosszabb a határnál (x nagyobb)', helyes: !rovid, uzenet: rovid ? uzForditott : '', ellenproba: rovid ? ellenK3 : '' },
+        { szoveg: 'mindig', helyes: false, uzenet: 'A két egyenes metszi egymást, ezért a metszéspont után megfordul a sorrend.', ellenproba: ellenK3 },
       ] }),
     ],
     tippek: [
-      `„Mikor olcsóbb?” → egyenlőtlenség: ${X.jel}(x) < ${(X === t.A ? t.B : t.A).jel}(x). Ugyanúgy rendezzük, mint az egyenletet.`,
-      'Nézze meg, melyik egyenes van lejjebb 0 km-nél (a kisebb alapdíjú) – a metszéspontig az az olcsóbb.',
+      'Melyik társaság alapdíja kisebb, vagyis melyik egyenes van lejjebb 0 km-nél? Mi történik a határnál?',
+      `„Mikor olcsóbb?” → egyenlőtlenség: ${X.jel}(x) < ${(X === t.A ? t.B : t.A).jel}(x). Ugyanúgy rendezzük, mint az egyenletet. A kisebb alapdíjú (a 0 km-nél lejjebb lévő) egyenes a metszéspontig az olcsóbb.`,
       'Ha negatív számmal oszt, az egyenlőtlenség iránya megfordul!',
     ],
     megoldas: [
@@ -151,6 +174,13 @@ function K3(rng) {
         ? `${f(t.B.c - t.A.c)}x < ${f(t.A.a - t.B.a)} → x < ${f(t.xs)}.`
         : `${f(t.A.a - t.B.a)} < ${f(t.B.c - t.A.c)}x → x > ${f(t.xs)}.`,
       `A(z) ${X.nev} <strong>${rovid ? `${f(t.xs)} km-nél rövidebb` : `${f(t.xs)} km-nél hosszabb`}</strong> utaknál olcsóbb (a határ: <strong>${fe(t.xs, 'km')}</strong>).`,
+    ],
+    magyarazat: [
+      `A „mikor olcsóbb?” kérdéshez először a határt kell tudni, ahol egyforma a díj: ${f(t.xs)} km. Itt a két egyenes metszi egymást, és a sorrend megfordul.`,
+      `0 km-nél csak az alapdíjat fizetjük: ${t.A.nev} ${f(t.A.a)} Ft, ${t.B.nev} ${f(t.B.a)} Ft. A kisebb alapdíjú (${t.B.nev}) a rövid utaknál olcsóbb, mert a magasabb kilométerdíj még keveset számít.`,
+      `A határ után a kisebb kilométerdíjú (${t.A.nev}) lesz olcsóbb, mert minden további kilométernél kevesebbet fizetünk.`,
+      `Ezért a(z) ${X.nev} ${rovid ? `${f(t.xs)} km-nél rövidebb` : `${f(t.xs)} km-nél hosszabb`} utaknál olcsóbb. Egyenlőtlenségnél, ha negatív számmal osztunk, az irány megfordul – ezért érdemes egy pontban ellenőrizni.`,
+      `Józan ésszel: ${f(xTeszt)} km-nél ${X.nev} ${f(ertek(X.c, X.a, xTeszt))} Ft, ${Y.nev} ${f(ertek(Y.c, Y.a, xTeszt))} Ft – tényleg a(z) ${X.nev} az olcsóbb ✓.`,
     ],
     abraMegoldas: tarifaAbra(t),
     jegyezze: '„Mikor olcsóbb?” → egyenlőtlenség. A kisebb alapdíjú tarifa a metszéspontig olcsóbb, utána a kisebb km-díjú.',
@@ -187,26 +217,35 @@ function K4(rng) {
     szoveg: `${k.bev} ${f(k.p1)} ${k.arSzo} árnál ${fe(k.q1, k.qe)}, ${f(k.p2)} ${k.arSzo} árnál ${fe(k.q2, k.qe)} a kereslet. Írja fel a keresleti függvényt D(p) = m·p + b alakban!`,
     mezok: [
       szamMezo({ id: 'm', cimke: 'Meredekség (m)', helyes: k.m, tizedes: 2,
+        ellenproba: (w) => `Ellenpróba: ha m = ${f(w)} lenne, akkor ${f(k.p2)} − ${f(k.p1)} = ${f(k.p2 - k.p1)} egységnyi áremelés ${f(w)} · ${f(k.p2 - k.p1)} = ${f(w * (k.p2 - k.p1))} keresletváltozást adna, de a két adat között ${f(k.q2 - k.q1)} a különbség.`,
         hibak: [
           { ertek: -k.m, uzenet: 'Előjel: a kereslet az ár növekedésével csökken, ezért a meredekség negatív.' },
           { ertek: tisztit(1 / k.m), uzenet: 'Fordítva osztott: m = Δ(kereslet) / Δ(ár) – az ár az x (független változó).' },
         ] }),
       szamMezo({ id: 'b', cimke: 'Konstans tag (b)', helyes: k.b, tizedes: 2,
+        ellenproba: (w) => `Ellenpróba: ha b = ${f(w)} lenne, akkor D(${f(k.p1)}) = ${f(k.m)} · ${f(k.p1)} + ${f(w)} = ${f(k.m * k.p1 + w)} lenne, de ${f(k.p1)} ${k.arSzo} árnál ${f(k.q1)} a kereslet.`,
         hibak: [
           { ertek: tisztit(k.q1 + k.m * k.p1), uzenet: 'Rendezésnél az ellenkező műveletet végezze: b = y₁ − m · x₁ (m negatív, így itt hozzáadunk).' },
           { ertek: tisztit(k.p1 - k.m * k.q1), uzenet: 'Az ár az x (első koordináta), a kereslet az y (második koordináta) – x helyére az árat írja.' },
         ] }),
     ],
     tippek: [
+      'Melyik a független változó (x), és melyik a függő (y) – az ár vagy a kereslet?',
       'Az ár a független változó (x), a kereslet a függő (y). Két pont: (ár; kereslet).',
-      `① m = (${f(k.q2)} − ${f(k.q1)}) / (${f(k.p2)} − ${f(k.p1)}).`,
-      `② Az első pontot beírva: ${f(k.q1)} = m · ${f(k.p1)} + b, ebből b.`,
+      `① m = (${f(k.q2)} − ${f(k.q1)}) / (${f(k.p2)} − ${f(k.p1)}). ② Az első pontot beírva: ${f(k.q1)} = m · ${f(k.p1)} + b, ebből b.`,
     ],
     megoldas: [
       `① m = Δy / Δx = (${f(k.q2)} − ${f(k.q1)}) / (${f(k.p2)} − ${f(k.p1)}) = ${f(k.q2 - k.q1)} / ${f(k.p2 - k.p1)} = <strong>${f(k.m)}</strong>.`,
       `② ${f(k.q1)} = ${f(k.m)} · ${f(k.p1)} + b = ${f(k.m * k.p1)} + b → b = ${f(k.q1)} + ${f(-k.m * k.p1)} = <strong>${f(k.b)}</strong>.`,
       `③ D(p) = ${linKif(k.m, k.b, 'p')} (${f(k.pmin)} ≤ p ≤ ${f(k.pmax)} között érvényes).`,
       `Jelentés: 1 egységnyi áremelés ${f(-k.m)} ${k.qe === 't' ? 'tonnával' : 'literrel'} csökkenti a keresletet.`,
+    ],
+    magyarazat: [
+      `Két adatpárunk van (ár; kereslet): (${f(k.p1)}; ${f(k.q1)}) és (${f(k.p2)}; ${f(k.q2)}). Az ár a független változó (x), a kereslet a függő (y).`,
+      `A meredekség azt mutatja, mennyit változik a kereslet, ha az ár 1 egységgel nő: (${f(k.q2)} − ${f(k.q1)}) : (${f(k.p2)} − ${f(k.p1)}) = ${f(k.q2 - k.q1)} : ${f(k.p2 - k.p1)} = ${f(k.m)}. Negatív, mert drágábban kevesebben vesznek – ez a keresleti függvény jellemzője.`,
+      `A konstans taghoz az első adatpárt írjuk be a D(p) = m · p + b képletbe: ${f(k.q1)} = ${f(k.m)} · ${f(k.p1)} + b. A szorzatot (${f(k.m * k.p1)}) az ellenkező művelettel visszük át: b = ${f(k.q1)} − (${f(k.m * k.p1)}) = ${f(k.b)}.`,
+      `A b a „0 áron” mért kereslet – ez közgazdaságilag nem értelmezhető, ha kívül esik a vizsgált tartományon. A függvény ${f(k.pmin)} ≤ p ≤ ${f(k.pmax)} között érvényes.`,
+      `Józan ésszel: a másik adatpárt is ellenőrizzük: ${f(k.m)} · ${f(k.p2)} + ${f(k.b)} = ${f(k.q2)} ✓.`,
     ],
     jegyezze: 'A keresleti függvény általában csökkenő (m < 0). Az ár az x, a kereslet az y.',
   };
@@ -225,23 +264,37 @@ function K5(rng) {
       return {
         szoveg: `${alap} Mekkora a kereslet ${f(p)} ${k.arSzo} árnál?`,
         mezok: [szamMezo({ cimke: `Kereslet (${k.qe})`, helyes: q, tizedes: 2, egyseg: k.qe,
+          ellenproba: (w) => `Ellenpróba: ha a kereslet ${f(w)} ${k.qe} lenne, akkor ${f(k.m)}p + ${f(k.b)} = ${f(w)} alapján az ár ${f(w - k.b)} : ${fz(k.m)} = ${f(xAdottY(k.m, k.b, w))} ${k.ae} lenne – a feladat szerint viszont ${f(p)} ${k.ae}.`,
           hibak: [
             { ertek: xAdottY(k.m, k.b, p), uzenet: 'Az x és az y felcserélődött: az ár a független változó (x), ezt kell a p helyére írni.' },
             { ertek: tisztit(k.m * p), uzenet: 'Kimaradt a konstans tag (b): D(p) = m · p + b.' },
           ] })],
-        tippek: ['Az ár ismert → p helyére írja be.', `D(${f(p)}) = ${f(k.m)} · ${f(p)} + ${f(k.b)}.`],
+        tippek: ['Melyik adat ismert: az ár (x) vagy a kereslet (y)?', `Az ár ismert → p helyére írja be: D(${f(p)}) = ${f(k.m)} · ${f(p)} + ${f(k.b)}.`],
         megoldas: [`D(${f(p)}) = ${f(k.m)} · ${f(p)} + ${f(k.b)} = ${f(k.m * p)} + ${f(k.b)} = <strong>${fe(q, k.qe)}</strong>.`],
+        magyarazat: [
+          `Az árat ismerjük (${f(p)} ${k.ae}), a keresletet keressük. Az ár a független változó (x), ezért p helyére beírjuk a számot.`,
+          `A D(p) = ${linKif(k.m, k.b, 'p')} függvényben a ${f(k.m)}p azt jelenti, hogy minden egységnyi ár ${f(Math.abs(k.m))} egységnyi keresletváltozással jár (az előjel mutatja az irányt), a ${f(k.b)} pedig a kiinduló rész.`,
+          `Behelyettesítve: ${f(k.m)} · ${f(p)} = ${f(k.m * p)}. Itt szorzunk, mert minden egységnyi ár ugyanannyival változtat a keresleten. Ehhez hozzáadjuk a konstans tagot: ${f(k.m * p)} + ${f(k.b)} = ${f(q)} ${k.qe}.`,
+          `Józan ésszel: ${f(p)} ${k.ae} az érvényességi tartományban van (${f(k.pmin)}–${f(k.pmax)}), ezért a kereslet a két szélső érték (${f(ertek(k.m, k.b, k.pmin))} és ${f(ertek(k.m, k.b, k.pmax))} ${k.qe}) közé esik ✓.`,
+        ],
         jegyezze: 'Az ár a független változó (x): adott árnál a keresletet behelyettesítéssel kapjuk.',
       };
     }
     return {
       szoveg: `${alap} Milyen árnál lesz a kereslet ${fe(q, k.qe)}?`,
       mezok: [szamMezo({ cimke: `Ár (${k.ae})`, helyes: p, tizedes: 2, egyseg: k.ae,
+        ellenproba: (w) => `Ellenpróba: ha az ár ${f(w)} ${k.ae} lenne, a kereslet D(${f(w)}) = ${f(k.m)} · ${f(w)} + ${f(k.b)} = ${f(ertek(k.m, k.b, w))} ${k.qe} lenne, nem ${f(q)} ${k.qe}.`,
         hibak: [
           { ertek: ertek(k.m, k.b, q), uzenet: `A megadott szám a kereslet (y), nem az ár: D(p) = ${f(q)}, és p-re rendezünk.` },
           { ertek: -p, uzenet: 'Előjelhiba: negatív számmal osztva figyeljen az előjelre – az ár pozitív.' },
         ] })],
-      tippek: ['A kereslet (y) ismert → D(p) = adott szám, és p-re rendezünk.', `${linKif(k.m, k.b, 'p')} = ${f(q)} → ${f(k.m)}p = ${f(q - k.b)}.`],
+      tippek: ['Melyik adat ismert: az ár (x) vagy a kereslet (y)?', `A kereslet (y) ismert → D(p) = adott szám, és p-re rendezünk: ${linKif(k.m, k.b, 'p')} = ${f(q)} → ${f(k.m)}p = ${f(q - k.b)}.`],
+      magyarazat: [
+        `A keresletet ismerjük (${f(q)} ${k.qe}), az árat keressük. A kereslet az y, ezért D(p) helyére a számot írjuk, és p-re rendezünk.`,
+        `${linKif(k.m, k.b, 'p')} = ${f(q)}. Az ellenkező műveletekkel haladunk: előbb a konstans tagot (${f(k.b)}) vonjuk le mindkét oldalból: ${f(k.m)}p = ${f(q)} − ${f(k.b)} = ${f(q - k.b)}.`,
+        `Aztán osztunk az p szorzójával: p = ${f(q - k.b)} : ${fz(k.m)} = ${f(p)}. Negatív számmal osztva a hányados előjele megfordul, ezért jön ki pozitív ár.`,
+        `Józan ésszel: ${f(p)} ${k.ae} az érvényességi tartományban van (${f(k.pmin)}–${f(k.pmax)}), és visszahelyettesítve D(${f(p)}) = ${f(q)} ${k.qe} ✓.`,
+      ],
       megoldas: [
         `${linKif(k.m, k.b, 'p')} = ${f(q)}.`,
         `${f(k.m)}p = ${f(q)} − ${f(k.b)} = ${f(q - k.b)} → p = ${f(q - k.b)} : ${fz(k.m)} = <strong>${fe(p, k.ae)}</strong>.`,
@@ -303,12 +356,14 @@ function K6(rng) {
     szoveg: szoveg + ' Mennyi az egyensúlyi ár és az egyensúlyi mennyiség?',
     mezok: [
       szamMezo({ id: 'x', cimke: 'Egyensúlyi ár ($/kg)', helyes: P.xs, tizedes: 2, egyseg: '$/kg',
+        ellenproba: (w) => `Ellenpróba: ${f(w)} $/kg árnál D(${f(w)}) = ${f(ertek(P.D.m, P.D.b, w))} t, S(${f(w)}) = ${f(ertek(P.S.m, P.S.b, w))} t – nem egyenlők, tehát ez nem az egyensúlyi ár.`,
         hibak: [{ ertek: tisztit((P.D.b + P.S.b) / (a + c)), uzenet: 'Rendezésnél figyeljen az előjelekre: a konstans tagokat kivonjuk egymásból.' }] }),
-      szamMezo({ id: 'y', cimke: 'Egyensúlyi mennyiség (t)', helyes: P.ys, tizedes: 2, egyseg: 't' }),
+      szamMezo({ id: 'y', cimke: 'Egyensúlyi mennyiség (t)', helyes: P.ys, tizedes: 2, egyseg: 't',
+        ellenproba: (w) => `Ellenpróba: az egyensúlyi ${f(P.xs)} $/kg árnál D(${f(P.xs)}) = ${f(ertek(P.D.m, P.D.b, P.xs))} t és S(${f(P.xs)}) = ${f(ertek(P.S.m, P.S.b, P.xs))} t, nem ${f(w)} t.` }),
     ],
     tippek: [
-      ...(elozetes.length ? ['Először írja fel mindkét függvényt két pontból (m = Δy/Δx, majd b).'] : []),
-      'Egyensúly: kereslet = kínálat → a két kifejezést egyenlővé tesszük.',
+      'Mi igaz az egyensúlyi ponton a keresletre és a kínálatra?',
+      (elozetes.length ? 'Először írja fel mindkét függvényt két pontból (m = Δy/Δx, majd b). ' : '') + 'Egyensúly: kereslet = kínálat → a két kifejezést egyenlővé tesszük.',
       `${linKif(P.D.m, P.D.b)} = ${linKif(P.S.m, P.S.b)} → x-es tagok egy oldalra, számok a másikra. A mennyiséghez az árat írja vissza.`,
     ],
     megoldas: [
@@ -316,6 +371,13 @@ function K6(rng) {
       `D(x) = S(x): ${linKif(P.D.m, P.D.b)} = ${linKif(P.S.m, P.S.b)}.`,
       `${f(P.D.b)} − ${fz(P.S.b)} = ${f(c)}x + ${f(a)}x → ${f(P.D.b - P.S.b)} = ${f(a + c)}x → x = <strong>${f(P.xs)} $/kg</strong>.`,
       `Mennyiség: D(${f(P.xs)}) = ${f(P.D.m)} · ${f(P.xs)} + ${f(P.D.b)} = <strong>${fe(P.ys, 't')}</strong> (ellenőrzés: S(${f(P.xs)}) = ${f(ertek(P.S.m, P.S.b, P.xs))}).`,
+    ],
+    magyarazat: [
+      'Egyensúlyban annyit akarnak venni (kereslet), amennyit kínálnak (kínálat): D(x) = S(x). Az egyensúlyi árat és a mennyiséget keressük.',
+      ...(elozetes.length ? ['Először mindkét függvényt fel kell írni két pontból: a meredekség Δy/Δx, utána egy pont beírásával a konstans tag.'] : []),
+      `Mivel a két érték egyenlő, a két kifejezést egyenlővé tesszük: ${linKif(P.D.m, P.D.b)} = ${linKif(P.S.m, P.S.b)}. Az x-es tagokat az egyik oldalra, a számokat a másikra visszük az ellenkező műveletekkel: ${f(P.D.b - P.S.b)} = ${f(a + c)}x.`,
+      `Az ár: x = ${f(P.D.b - P.S.b)} : ${f(a + c)} = ${f(P.xs)} $/kg. A mennyiséget úgy kapjuk, hogy az árat visszaírjuk bármelyik függvénybe: D(${f(P.xs)}) = ${f(P.ys)} t, és S(${f(P.xs)}) is ${f(ertek(P.S.m, P.S.b, P.xs))} t – ez egyben az ellenőrzés.`,
+      `Józan ésszel: az ár és a mennyiség pozitív, és a ponton a kereslet és a kínálat valóban egyenlő. Ennél magasabb árnál többet kínálnának, mint amennyit vesznek; alacsonyabb árnál fordítva.`,
     ],
     abraMegoldas: piacAbra(P),
     jegyezze: 'Egyensúlyi ár és mennyiség: ahol a kereslet = kínálat, vagyis a két egyenes metszéspontja.',
@@ -334,6 +396,7 @@ function K7(rng) {
     return {
       szoveg: piacSzoveg(P) + ` Mennyi lesz a piac bevétele ($), ha a kenyér ára ${f(p)} $/kg?`,
       mezok: [szamMezo({ cimke: 'Bevétel ($)', helyes: R, tizedes: 0, egyseg: '$',
+        ellenproba: (w) => `Ellenpróba: ${f(w)} $ bevétel ${f(p)} $/kg árnál ${f(w / p)} kg = ${f(w / p / 1000)} t eladott mennyiséget jelentene, de a piac csak ${f(q)} t-t tud eladni (a kereslet ${f(d)} t, a kínálat ${f(s)} t közül a kisebb).`,
         hibak: [
           { ertek: bevetel(p, Q), uzenet: 'Csak annyit tudnak eladni, amennyi a kereslet és a kínálat közül a kevesebb.' },
           { ertek: tisztit(p * q), uzenet: 'Az ár kg-ra vonatkozik, a mennyiség tonnában van: 1 t = 1000 kg.' },
@@ -341,14 +404,21 @@ function K7(rng) {
           { ertek: bevetel(P.xs, P.ys), uzenet: `Ez az egyensúlyi bevétel. Most az ár ${f(p)} $/kg, nem az egyensúlyi ár.` },
         ] })],
       tippek: [
-        `Számolja ki ${f(p)} $/kg árnál a keresletet és a kínálatot is.`,
-        'Eladni csak a kisebbiket lehet: ha kevesebben akarnak venni, a kereslet; ha kevesebbet kínálnak, a kínálat korlátoz.',
+        'Mennyit tudnak ténylegesen eladni, ha a kereslet és a kínálat különbözik?',
+        `Számolja ki ${f(p)} $/kg árnál a keresletet és a kínálatot is. Eladni csak a kisebbiket lehet: ha kevesebben akarnak venni, a kereslet; ha kevesebbet kínálnak, a kínálat korlátoz.`,
         'Bevétel = ár · eladott mennyiség – az ár $/kg, a mennyiség tonna (1 t = 1000 kg).',
       ],
       megoldas: [
         `D(${f(p)}) = ${f(P.D.m)} · ${f(p)} + ${f(P.D.b)} = ${fe(d, 't')}; S(${f(p)}) = ${f(P.S.m)} · ${f(p)} + ${fz(P.S.b)} = ${fe(s, 't')}.`,
         `Eladott mennyiség: a kisebbik, ${fe(q, 't')} = ${f(q * 1000)} kg (${d < s ? 'a kereslet korlátoz' : 'a kínálat korlátoz'}).`,
         `Bevétel = ${f(p)} · ${f(q * 1000)} = <strong>${fe(R, '$', 0)}</strong>.`,
+      ],
+      magyarazat: [
+        `A bevételt keressük: ár · eladott mennyiség. Az ár ${f(p)} $/kg, de az eladott mennyiséget előbb ki kell számolni.`,
+        `Nem egyensúlyi árnál a kereslet és a kínálat különbözik: D(${f(p)}) = ${f(d)} t, S(${f(p)}) = ${f(s)} t.`,
+        `Eladni mindig csak a kisebbiket lehet: ha többet kínálnak, mint amennyit vennének, a többlet nem fogy el; ha kevesebbet, a vevők nem kaphatnak többet. Itt ${d < s ? 'a kereslet' : 'a kínálat'} a kisebb: ${f(q)} t.`,
+        `Az ár kilogrammra vonatkozik, a mennyiség tonnában van, ezért átváltunk: ${f(q)} t = ${f(q * 1000)} kg (1 t = 1000 kg). Bevétel = ${f(p)} · ${f(q * 1000)} = ${f(R)} $.`,
+        `Józan ésszel: ha tonnát szoroznánk a kilogrammos árral, 1000-szer kisebb szám jönne ki – az nem ésszerű. Az egyensúlyi bevétel ${f(bevetel(P.xs, P.ys))} $ lenne, ettől a mostani eltér, mert az ár nem egyensúlyi.`,
       ],
       abraMegoldas: piacAbra(P, p),
       jegyezze: 'Nem egyensúlyi árnál a kereslet és a kínálat közül a kisebb valósul meg. Bevételnél figyeljen a mértékegységekre!',

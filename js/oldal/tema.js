@@ -1,6 +1,6 @@
 // Témaoldal: Elmélet röviden – Kidolgozott példák – Gyakorlás (fülekkel).
 import { el } from './kozos.js';
-import { mezokRajzol, abraElem } from './feladat-nezet.js';
+import { mezokRajzol, abraElem, miertElem } from './feladat-nezet.js';
 import { temaKeres, TEMAK } from '../temak/index.js';
 import { ellenoriz, helyesE } from '../lib/ellenorzo.js';
 import { ujRng, valaszt } from '../lib/rng.js';
@@ -29,6 +29,9 @@ function elmeletPanel() {
     el('h2', { text: 'Elmélet röviden' }),
     kulcskepletDoboz(),
     el('ul', { class: 'elmelet-lista' }, tema.elmelet.map((p) => el('li', { html: p }))),
+    tema.elmeletAbra ? el('figure', { class: 'elmelet-abra' },
+      abraElem(tema.elmeletAbra),
+      tema.elmeletAbraFelirat ? el('figcaption', { html: tema.elmeletAbraFelirat }) : null) : null,
     el('div', { class: 'gombsor' },
       el('button', { type: 'button', class: 'gomb', onclick: () => fulValt('peldak') }, 'Kidolgozott példák →'),
       el('button', { type: 'button', class: 'gomb elsodleges', onclick: () => fulValt('gyakorlas') }, 'Gyakorlás →')),
@@ -71,7 +74,9 @@ function peldakPanel() {
 }
 
 // ---------- Gyakorlás ----------
-const gy = { valasztott: 'vegyes', tipus: null, feladat: null, nezet: null, rogzitve: false, tippSzint: 0, megoldasLatta: false };
+const gy = { valasztott: 'vegyes', tipus: null, feladat: null, nezet: null, rogzitve: false, tippSzint: 0, megoldasLatta: false, fixSorszam: 0 };
+const fixek = tema.fixek || [];
+const FIX_ELOTAG = 'fix:';
 let gyakorlasHely, tipusSelect, tipusLista;
 
 function tipusFelirat(t) {
@@ -97,6 +102,19 @@ function tipusListaFrissit() {
 function ujFeladat(fokuszal = true) {
   const tipusok = tema.tipusok;
   let tipus;
+  gy.fix = gy.valasztott.startsWith(FIX_ELOTAG);
+  if (gy.fix) {
+    // fix számokkal megadott feladat (a feladatlap páros feladatai, banki ajánlatok)
+    const fx = fixek.find((x) => x.id === gy.valasztott.slice(FIX_ELOTAG.length)) || fixek[0];
+    gy.tipus = { id: fx.id, nev: fx.nev };
+    gy.feladat = fx.epit();
+    gy.rogzitve = true; // a fix feladatok nem számítanak bele a „megy” sorozatba
+    gy.tippSzint = 0;
+    gy.megoldasLatta = false;
+    feladatRajzol();
+    if (fokuszal) gy.nezet.mezok[0].fokusz();
+    return;
+  }
   if (gy.valasztott === 'vegyes') {
     const tobbi = tipusok.filter((t) => t !== gy.tipus);
     tipus = valaszt(rng, tobbi.length ? tobbi : tipusok);
@@ -121,7 +139,9 @@ function feladatRajzol() {
   const megoldas = el('div', { class: 'megoldas', hidden: true });
   const tippGomb = el('button', { type: 'button', class: 'gomb' }, 'Tipp');
   const megoldasGomb = el('button', { type: 'button', class: 'gomb' }, 'Megoldás mutatása');
-  const ujGomb = el('button', { type: 'button', class: 'gomb halk' }, 'Új feladat');
+  const ujGomb = el('button', { type: 'button', class: 'gomb halk' }, gy.fix ? 'Következő fix feladat' : 'Új feladat');
+  const miert = miertElem(f);
+  if (miert) miert.hidden = true;
 
   const urlap = el('form', { novalidate: true, 'aria-label': 'Feladat' },
     nezet.elem,
@@ -146,6 +166,7 @@ function feladatRajzol() {
   megoldasGomb.addEventListener('click', () => {
     megoldas.hidden = false;
     megoldasGomb.disabled = true;
+    if (miert) { miert.hidden = false; miert.open = true; }
     if (!gy.rogzitve) {
       gy.megoldasLatta = true;
       gy.rogzitve = true;
@@ -155,14 +176,21 @@ function feladatRajzol() {
     megoldas.querySelector('h3').focus();
   });
 
-  ujGomb.addEventListener('click', () => ujFeladat());
+  ujGomb.addEventListener('click', () => {
+    if (gy.fix) {
+      const i = fixek.findIndex((x) => FIX_ELOTAG + x.id === gy.valasztott);
+      gy.valasztott = FIX_ELOTAG + fixek[(i + 1) % fixek.length].id;
+      if (tipusSelect) tipusSelect.value = gy.valasztott;
+    }
+    ujFeladat();
+  });
 
   megoldas.append(
     el('h3', { tabindex: '-1', text: 'Megoldás lépésenként' }),
     el('ol', { class: 'lepesek' }, f.megoldas.map((l) => el('li', { html: l }))),
     abraElem(f.abraMegoldas),
     el('p', { class: 'jegyezze', html: `Ezt jegyezze meg: ${f.jegyezze}` }),
-    el('p', { class: 'figyelmeztetes', text: 'Ez a feladat nem számít bele a „3 egymás után jó” sorozatba. Próbáljon ki egy új feladatot!' }));
+    gy.fix ? null : el('p', { class: 'figyelmeztetes', text: 'Ez a feladat nem számít bele a „3 egymás után jó” sorozatba. Próbáljon ki egy új feladatot!' }));
 
   gyakorlasHely.replaceChildren(el('article', { class: 'feladat', 'aria-labelledby': 'feladatCim' },
     el('div', { class: 'feladat-fej' },
@@ -170,7 +198,8 @@ function feladatRajzol() {
     el('p', { class: 'feladat-szoveg', html: f.szoveg }),
     f.utasitas ? el('p', { class: 'utasitas', text: f.utasitas }) : null,
     abraElem(f.abra),
-    urlap, osszesito, tippLista, megoldas));
+    urlap, osszesito, tippLista, megoldas, miert));
+  gy.miert = miert;
 }
 
 function ellenorzes(osszesito) {
@@ -196,10 +225,13 @@ function ellenorzes(osszesito) {
       tipusListaFrissit();
     }
     osszesito.classList.add('jo');
+    if (gy.miert) { gy.miert.hidden = false; }
     osszesito.replaceChildren(...[
       el('p', {}, el('span', { class: 'ikon', text: '✔ ' }), el('strong', { text: valaszt(rng, ['Helyes!', 'Szép munka, ez jó!', 'Pontosan így van!']) })),
       el('p', { class: 'jegyezze', html: `Ezt jegyezze meg: ${f.jegyezze}` }),
-      sorozatUzenet ? el('p', { text: sorozatUzenet }) : null].filter(Boolean));
+      sorozatUzenet ? el('p', { text: sorozatUzenet }) : null,
+      gy.miert ? el('p', {}, el('button', { type: 'button', class: 'gomb halk', onclick: () => { gy.miert.hidden = false; gy.miert.open = true; gy.miert.querySelector('summary').focus(); } }, 'Miért így? – magyarázat szavakkal')) : null,
+    ].filter(Boolean));
     return;
   }
   if (hibas && !gy.rogzitve) {
@@ -227,7 +259,9 @@ function ellenorzes(osszesito) {
 function gyakorlasPanel() {
   tipusSelect = el('select', { id: 'tipusValaszto' },
     el('option', { value: 'vegyes' }, 'Vegyes (minden típus)'),
-    tema.tipusok.map((t) => el('option', { value: t.id }, tipusFelirat(t))));
+    tema.tipusok.map((t) => el('option', { value: t.id }, tipusFelirat(t))),
+    fixek.length ? el('optgroup', { label: 'Fix számokkal (feladatlap, banki ajánlatok)' },
+      fixek.map((x) => el('option', { value: FIX_ELOTAG + x.id }, `${x.id} – ${x.nev}`))) : null);
   tipusSelect.value = gy.valasztott;
   tipusSelect.addEventListener('change', () => { gy.valasztott = tipusSelect.value; ujFeladat(false); });
   tipusLista = el('ul', { class: 'tipus-lista' });

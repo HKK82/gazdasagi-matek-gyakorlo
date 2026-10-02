@@ -22,14 +22,16 @@ export function egyezik(v, cel, tizedes) {
  */
 export function szamMezo({
   id = 'v', cimke, helyes, tizedes = 2, elojel = 'sima', egyseg = '', hibak = [],
-  alternativ = [], elojelUzenet = '', negativ = false,
+  alternativ = [], elojelUzenet = '', negativ = false, abszTures = 0, ellenproba = null,
 }) {
   const tiszta = [];
   // egy tipikus hiba csak akkor marad, ha a kért pontosság mellett nem fogadnánk el helyesnek
   const kozel = (a, b) => egyezik(a, b, tizedes) || egyezik(b, a, tizedes);
+  // abszTures: kerekítési eltérés (pl. ±1 Ft), amit megjegyzéssel elfogadunk – a hibák ettől is távol legyenek
+  const abszKozel = (a, b) => abszTures > 0 && Math.abs(a - b) <= abszTures + tures(tizedes) + 1e-9;
   for (const h of hibak) {
     if (!Number.isFinite(h.ertek)) continue;
-    if (kozel(h.ertek, helyes)) continue;
+    if (kozel(h.ertek, helyes) || abszKozel(h.ertek, helyes)) continue;
     if (alternativ.some((a) => kozel(h.ertek, a))) continue;
     if (elojel !== 'sima' && kozel(h.ertek, -helyes)) continue;
     if (tiszta.some((t) => kozel(t.ertek, h.ertek))) continue;
@@ -37,7 +39,9 @@ export function szamMezo({
   }
   return {
     tipus: 'szam', id, cimke, helyes, tizedes, elojel, egyseg, hibak: tiszta,
-    alternativ, elojelUzenet,
+    alternativ, elojelUzenet, abszTures,
+    // ellenproba(v): a hallgató saját számával mutatja meg szövegesen, miért nem stimmel (lásd SPEC 3.2)
+    ellenproba: typeof ellenproba === 'function' ? ellenproba : null,
     negativ: negativ || helyes < 0 || elojel !== 'sima',
   };
 }
@@ -56,9 +60,15 @@ export const UZENET = {
 
 /**
  * Egy mező ellenőrzése.
- * Eredmény: { allapot: 'jo' | 'jo-megjegyzes' | 'tipikus' | 'rossz' | 'ervenytelen' | 'ures', uzenet, ertek }
+ * Eredmény: { allapot: 'jo' | 'jo-megjegyzes' | 'tipikus' | 'rossz' | 'ervenytelen' | 'ures', uzenet, ertek, ellenproba? }
+ * Tipikus és egyéb hibás válasznál az `ellenproba` a hallgató saját számával végzett számszerű ellenpróba.
  * A 'jo' és 'jo-megjegyzes' számít helyesnek.
  */
+function ellenprobaSzoveg(mezo, v) {
+  if (typeof mezo.ellenproba !== 'function') return '';
+  try { return mezo.ellenproba(v) || ''; } catch { return ''; }
+}
+
 export function ellenoriz(mezo, bevitel) {
   if (mezo.tipus === 'valasztas') {
     if (bevitel === '' || bevitel === null || bevitel === undefined) {
@@ -68,8 +78,8 @@ export function ellenoriz(mezo, bevitel) {
     if (!o) return { allapot: 'ervenytelen', uzenet: UZENET.ervenytelen };
     if (o.helyes) return { allapot: 'jo', uzenet: '' };
     return o.uzenet
-      ? { allapot: 'tipikus', uzenet: o.uzenet }
-      : { allapot: 'rossz', uzenet: 'Nem ez a helyes válasz. Gondolja végig újra!' };
+      ? { allapot: 'tipikus', uzenet: o.uzenet, ellenproba: o.ellenproba || '' }
+      : { allapot: 'rossz', uzenet: 'Nem ez a helyes válasz. Gondolja végig újra!', ellenproba: o.ellenproba || '' };
   }
 
   const p = ertelmez(bevitel);
@@ -94,13 +104,21 @@ export function ellenoriz(mezo, bevitel) {
         uzenet: mezo.elojelUzenet || (mezo.helyes < 0
           ? 'Figyeljen az előjelre: itt csökkenés történt, ezért a változás negatív szám.'
           : 'Figyeljen az előjelre: itt növekedés történt, ezért a változás pozitív szám.'),
+        ellenproba: ellenprobaSzoveg(mezo, v),
       };
     }
   }
-  for (const h of mezo.hibak || []) {
-    if (egyezik(v, h.ertek, d)) return { allapot: 'tipikus', uzenet: h.uzenet, ertek: v };
+  if (mezo.abszTures > 0 && Math.abs(v - mezo.helyes) <= mezo.abszTures + 1e-9) {
+    return {
+      allapot: 'jo-megjegyzes', ertek: v,
+      uzenet: `Elfogadva. A kerekítés miatt ±${formaz(mezo.abszTures, 0)}${mezo.egyseg ? ' ' + mezo.egyseg : ''} eltérés előfordulhat; a pontos érték ${formaz(mezo.helyes, d)}${mezo.egyseg ? ' ' + mezo.egyseg : ''}.`,
+    };
   }
-  return { allapot: 'rossz', uzenet: UZENET.rossz, ertek: v };
+  const ellenproba = ellenprobaSzoveg(mezo, v);
+  for (const h of mezo.hibak || []) {
+    if (egyezik(v, h.ertek, d)) return { allapot: 'tipikus', uzenet: h.uzenet, ertek: v, ellenproba };
+  }
+  return { allapot: 'rossz', uzenet: UZENET.rossz, ertek: v, ellenproba };
 }
 
 export function helyesE(eredmeny) {

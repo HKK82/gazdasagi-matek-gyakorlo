@@ -6,6 +6,17 @@ let sorszam = 0;
 const IKON = { jo: '✔', 'jo-megjegyzes': '✔', tipikus: '⚠', rossz: '✖', ervenytelen: 'ℹ', ures: 'ℹ' };
 const OSZTALY = { jo: 'jo', 'jo-megjegyzes': 'jo', tipikus: 'tipikus', rossz: 'rossz', ervenytelen: 'info', ures: 'info' };
 
+/**
+ * „Miért így?” – szöveges magyarázat a feladat konkrét számaival (SPEC 3.2).
+ * Lenyitható; a `nyitva` megadja, hogy kinyitva jelenjen-e meg.
+ */
+export function miertElem(feladat, nyitva = false) {
+  if (!feladat.magyarazat || !feladat.magyarazat.length) return null;
+  return el('details', { class: 'miert', open: nyitva },
+    el('summary', { text: 'Miért így? – magyarázat szavakkal' }),
+    el('div', { class: 'miert-szoveg' }, feladat.magyarazat.map((p) => el('p', { html: p }))));
+}
+
 export function abraElem(svg) {
   if (!svg) return null;
   return el('div', { class: 'abra-tarto', html: typeof svg === 'function' ? svg() : svg });
@@ -54,7 +65,8 @@ export function mezokRajzol(feladat, { visszajelzes = true } = {}) {
         sor.className = 'mezo allapot-' + OSZTALY[eredmeny.allapot];
         const szoveg = eredmeny.allapot === 'jo' ? 'Helyes.' : eredmeny.uzenet;
         vj.className = 'mezo-vj vj-' + OSZTALY[eredmeny.allapot];
-        vj.textContent = `${IKON[eredmeny.allapot]} ${szoveg}`;
+        vj.replaceChildren(`${IKON[eredmeny.allapot]} ${szoveg}`);
+        if (eredmeny.ellenproba) vj.append(el('span', { class: 'ellenproba', text: eredmeny.ellenproba }));
         const rossz = !(eredmeny.allapot === 'jo' || eredmeny.allapot === 'jo-megjegyzes');
         for (const b of bemenetek) {
           if (rossz) b.setAttribute('aria-invalid', 'true'); else b.removeAttribute('aria-invalid');

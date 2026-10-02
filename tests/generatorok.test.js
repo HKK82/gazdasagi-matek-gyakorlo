@@ -121,7 +121,9 @@ const VARHATO = {
 // Típusok, amelyeknél a SPEC tipikus hibát ír elő – ezeknél minden feladatban kell lennie felismert hibának.
 const KELL_TIPIKUS = new Set(['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'L1', 'L2', 'L3', 'L4', 'L6', 'L7', 'K1', 'K3', 'K4', 'K5', 'K7']);
 
-for (const tema of TEMAK) {
+// A pénzügyi téma (kerekített forintos / %-os válaszok, hitel-történetek) saját, toleranciát kezelő
+// független ellenőrzést kap: tests/penzugy.test.js.
+for (const tema of TEMAK.filter((t) => t.id !== 'penzugy')) {
   for (const tipus of tema.tipusok) {
     test(`${tema.id} / ${tipus.id} – ${tipus.nev}: ${MINTA} generált feladat helyes`, () => {
       assert.ok(VARHATO[tipus.id], 'van független ellenőrzés');
