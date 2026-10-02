@@ -52,4 +52,14 @@ export function az(x, d = 2, nagy = false) {
 }
 export const Az = (x, d = 2) => az(x, d, true);
 
+/** Felső index számjegyekkel: 1,08³ (sima szövegben és HTML-ben is működik). */
+export const sup = (n) => String(n).replace(/\d/g, (d) => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d]);
+
+/** Hatvány szépen: egész kitevő → 1,08³, törtkitevő → 1,05^9,5. */
+export const hatv = (alap, kitevo, d = 4) =>
+  (Number.isInteger(kitevo) ? `${formaz(alap, d)}${sup(kitevo)}` : `${formaz(alap, d)}^${formaz(kitevo, 2)}`);
+
+/** Igaz, ha a szám még értelmesen kiírható (nem végtelen, nem csillagászati). */
+export const kezelheto = (x, hatar = 1e12) => Number.isFinite(x) && Math.abs(x) < hatar;
+
 export { tisztit };

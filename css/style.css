@@ -250,6 +250,22 @@ details.doboz summary { cursor: pointer; font-weight: 600; }
 .osszesito .ikon { font-weight: 800; }
 .jegyezze { font-weight: 600; }
 
+/* ---- „Miért így?” magyarázat és ellenpróba ---- */
+.miert { border: 2px solid var(--kiemel); border-radius: 10px; background: var(--kiemel-halvany); margin: .9rem 0; padding: .1rem .9rem; }
+.miert[hidden] { display: none; }
+.miert > summary { cursor: pointer; font-weight: 700; padding: .6rem 0; }
+.miert-szoveg p { margin: .5rem 0; }
+.miert-szoveg { padding-bottom: .5rem; }
+.ellenproba { display: block; margin-top: .3rem; padding: .4rem .6rem; border-left: 4px solid var(--tipikus); background: var(--felulet-2); color: var(--szoveg); border-radius: 0 6px 6px 0; font-style: normal; }
+.elmelet-abra { margin: 1rem 0; }
+.elmelet-abra figcaption { color: var(--halvany); font-size: .95rem; max-width: 40rem; }
+
+/* ---- Táblázat a példákban ---- */
+table.tabla { border-collapse: collapse; width: 100%; margin: .5rem 0; font-size: .95rem; }
+table.tabla th, table.tabla td { border: 1px solid var(--keret); padding: .35rem .5rem; text-align: left; }
+table.tabla thead th { background: var(--felulet-2); }
+.lepesek li:has(table) { overflow-x: auto; }
+
 .tippek { margin: .5rem 0; padding-left: 0; list-style: none; }
 .tippek li { background: var(--kiemel-halvany); border-radius: 8px; padding: .5rem .75rem; margin: .4rem 0; }
 .megoldas { border-top: 2px dashed var(--keret); margin-top: 1rem; padding-top: .75rem; }
@@ -270,6 +286,8 @@ svg.abra { width: 100%; max-width: 520px; height: auto; display: block; backgrou
 .abra-vonal.v2 { stroke: var(--v2); }
 .abra-vonal.v3 { stroke: var(--v3); }
 .abra-pont { fill: var(--piros); stroke: var(--felulet); stroke-width: 2; }
+.abra-pont-v2 { fill: var(--v2); stroke: var(--felulet); stroke-width: 2; }
+.abra-oszlop { fill: var(--v1); opacity: .85; }
 .abra-seged { stroke: var(--halvany); stroke-width: 1.5; stroke-dasharray: 5 4; }
 
 .tipus-valaszto { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }

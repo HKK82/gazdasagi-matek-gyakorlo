@@ -32,6 +32,11 @@ test('a kidolgozott példák szövegében a SPEC végeredményei szerepelnek', (
   for (const v of ['x = 5,25 kg', '400 $', 'x = 13 év', 'V(x) = −120x + 1160', '9,7 év', 'F(x) = 0,15x + 4,2', 'x = 22 év', 'y = 2x − 1', 'y = −⅓x + 2']) {
     assert.ok(li.includes(v), v);
   }
+  const p = szoveg('penzugy');
+  for (const v of ['86 400 Ft', '93 312 Ft', '100 777 Ft', '372 877 Ft', '123 967 Ft', '9 év', '4,5 %', '207 106 Ft',
+    '118 810', '119 252', '119 562', '18,81 %', '19,25 %', '19,56 %', '19,72 %', '5 400 000 Ft', '8,5 %', '10 563 035 Ft', '7 év', '7 439 998 Ft', '12,68 %']) {
+    assert.ok(p.includes(v), v);
+  }
   const k = szoveg('kozgazdasag');
   for (const v of ['x = 2,5 km', '2830 Ft', '2900 Ft', 'x = 5 km', '1850 Ft', 'x < 5 km', 'D(p) = −2p + 1500', '1100 liter', 'p = 150 Ft', 'x = 3 $/kg', '4 t', '12 000 $', '8750 $', '12 480 $']) {
     assert.ok(k.includes(v), v);

@@ -1,12 +1,13 @@
 # Gazdasági matematika – gyakorló
 
 Böngészőben futó gyakorlóoldal a Kodolányi János Egyetem *Gazdasági matematika* tárgyához.
-Három téma: **százalékszámítás**, **lineáris függvények**, **lineáris függvények közgazdasági alkalmazása**,
-valamint egy 10 feladatos, 20 perces **próbateszt**.
+Négy téma: **százalékszámítás**, **lineáris függvények**, **lineáris függvények közgazdasági alkalmazása**,
+**pénzügyi számítások (kamatos kamat)**, valamint egy 10 feladatos, 20 perces **próbateszt**.
 
 **Élő oldal (GitHub Pages):** https://hkk82.github.io/gazdasagi-matek-gyakorlo/
 
 - Nincs belépés, nincs adatgyűjtés, nincs külső kérés. A haladás csak a hallgató böngészőjében (`localStorage`) mentődik.
+- Minden feladattípushoz **„Miért így?” szöveges magyarázat**, hibás válaszra **számszerű ellenpróba** (a hallgató saját számával), és kérdés formájú első tipp tartozik.
 - Statikus HTML + CSS + vanilla JavaScript (ES modulok); nincs build lépés és nincs npm-függőség.
 - A részletes megrendelői leírás: [SPEC.md](SPEC.md).
 
@@ -45,8 +46,9 @@ A tesztek ellenőrzik:
 
 - a válaszellenőrzőt: tizedesvessző/-pont, ezres szóköz, mértékegység- és %-utótag, tűrés (a pontosabb válasz is jó), előjelszabályok, képlet elutasítása;
 - **minden feladattípusból 300 generált feladatot**: a helyes választ a feladat *szövegéből* (a grafikonos feladatnál az SVG-ábrából) visszaolvasott számokból, a generátortól függetlenül újraszámolják; a szövegben csak „szép” (legfeljebb 2 tizedes) számok vannak; a tipikus hibás válaszok különböznek a jótól, és beírva a célzott visszajelzést adják;
-- a SPEC kidolgozott példáinak végeredményeit;
-- a próbateszt összeállítását (10 feladat, 4/3/3 arány, egyetlen számmező) és a haladás mentését (tároló nélkül is).
+- a SPEC kidolgozott példáinak végeredményeit (a 4. témánál a gyakorló párok és a banki ajánlatok fix feladatait is);
+- minden típus magyarázatát, ellenpróbáját és rávezető első tippjét (`tests/magyarazat.test.js`), a pénzügyi téma generátorait külön (`tests/penzugy.test.js`);
+- a próbateszt összeállítását (10 feladat, 3/3/2/2 arány, egyetlen számmező) és a haladás mentését (tároló nélkül is).
 
 ## Új téma hozzáadása
 
@@ -62,6 +64,8 @@ export default {
   elmelet: ['…', '…'],            // 3–6 pont (HTML)
   peldak: [{ cim, feladat, lepesek: ['1. lépés', '2. lépés'], abra? }],
   tipusok: [{ id: 'U1', nev: 'Típus neve', general: (rng) => feladat, tesztbe?: false }],
+  elmeletAbra?: () => '<svg …>', elmeletAbraFelirat?: '…',   // az Elmélet fül ábrája
+  fixek?: [{ id, nev, epit: () => feladat }],                // fix számokkal elérhető feladatok
   peldaEllenorzes: () => [{ nev, kapott, vart }],   // a kidolgozott példák végeredményei
 };
 ```
@@ -79,7 +83,8 @@ export default {
                hibak: [{ ertek, uzenet }] }),          // tipikus hibák célzott üzenettel
     valasztoMezo({ id, cimke, opciok: [{ szoveg, helyes, uzenet? }] }),
   ],
-  tippek: ['1. szint', '2. szint', '3. szint'],
+  tippek: ['1. szint – mindig kérdés, ami rávezet', '2. szint', '3. szint'],
+  magyarazat: ['„Miért így?” – 3–5 bekezdés szavakkal, a feladat számaival (HTML)'],
   megoldas: ['1. lépés', '2. lépés'],
   jegyezze: '„Ezt jegyezze meg” mondat a típushoz.',
 }
