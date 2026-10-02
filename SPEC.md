@@ -42,6 +42,43 @@ Ez a fájl a megrendelő (oktató) igényeit és a teljes szakmai tartalmat írj
 - **Megoldás mutatása**: teljes, lépésenkénti levezetés.
 - A haladás feladattípusonként: hány jó megoldás (pl. 3 egymás utáni jó után a típus „megy” jelzést kap).
 
+### 3.2 Részletes, szöveges magyarázatok (v2 – MINDEN témára, a meglévő 1–3. témára is)
+
+A hallgatók nagy része nem matematikus. A v1 megoldásai helyesek, de túl tömörek és képletszerűek („P₀ = P₁ : q”). Minden feladattípushoz kell egy **érthető, hétköznapi nyelvű magyarázat** is – úgy, ahogy egy türelmes tanár élőszóban elmondaná.
+
+Minden feladattípus kapja meg:
+
+1. **„Miért így?” magyarázat** (külön gomb/lenyitható rész a megoldás mellett, a megoldás után automatikusan is felkínálva): 4–8 rövid mondat, **szavakkal**, a feladat konkrét számaival. Szerkezete:
+   - **Mit kérdeznek, és mi az ismeretlen?** (pl. „A régi árat keressük – ez a 100 %.”)
+   - **A gondolat hétköznapi nyelven** (pl. „Az engedmény után a régi árnak csak egy részét fizetjük…”).
+   - **Szemléltetés 100-zal vagy kerek számmal**, ahol lehet (a tanár kedvenc trükkje): „Ha a régi ár 100 € lenne, most 95 €-t fizetnénk…”.
+   - **Miért ez a művelet** (szorzás/osztás/hatvány/gyök/logaritmus) – egy mondatban, képlet nélkül is.
+   - **Józan ész ellenőrzés**: nagyobb vagy kisebb lett-e, mint vártuk, és miért.
+2. **Hibás válasznál számszerű ellenpróba**: ne csak azt írja ki, hogy rossz, hanem **mutassa meg a hallgató saját számával**, miért nem stimmel (pl. „Ha az eredeti ár 4588,5 € lett volna, az 5 %-os engedmény után 4588,5 · 0,95 = 4359,08 € lenne, nem 4370 €.”).
+3. **Lépcsőzetes tippek**: az első tipp mindig **kérdés** legyen, ami rávezet (pl. „Ki a 100 %?”, „Melyik betű az ismeretlen a képletben?”), ne rögtön a képlet.
+4. A meglévő képletes levezetés maradjon meg – a szöveges magyarázat **kiegészíti**, nem helyettesíti.
+5. Nyelv: rövid mondatok, magázás nélküli semleges felszólító forma, szakszó csak magyarázattal (pl. „kamattényező, vagyis amivel szorzunk”). Kerülje a túlzott lelkesedést és a töltelékszöveget.
+
+**Minta – T5 (csökkenés, régi érték): „Egy laptop ára 5 %-os árengedmény után 4370 €. Mennyi volt az eredeti ára?”**
+
+> **Miért így?**
+> A régi, eredeti árat keressük – ez a 100 %. Az engedmény után nem a teljes árat fizetjük, hanem annak csak a 95 %-át (100 % − 5 %).
+> Képzelje el, hogy a régi ár 100 € volt: akkor most 95 €-t fizetnénk. A 95 € tehát mindig kevesebb, mint a régi ár.
+> Ezt tudjuk: a régi ár 95 %-a = 4370 €. Ha a 95 %-ból akarunk visszajutni a 100 %-hoz, **osztunk** 0,95-dal: 4370 : 0,95 = 4600 €.
+> Józan ésszel: engedmény előtt drágább volt, és a 4600 € valóban több, mint 4370 €. Visszaszámolva: 4600 · 0,95 = 4370 ✓.
+>
+> **Ha 4588,5 €-t írt (4370 · 1,05):** ilyenkor a 4370 €-hoz adta hozzá az 5 %-ot. Csakhogy az 5 % a *régi* árból járt le, nem a 4370-ből. Ellenpróba: 4588,5 · 0,95 = 4359,08 €, ami nem 4370 €.
+
+**Minta – P2 (jelenérték): „10 %-os kamat mellett 2 év múlva 150 000 Ft lett a számlán. Mennyit tettünk be?”**
+
+> **Miért így?**
+> A betett összeget, a mai pénzt (jelenérték) keressük. A bank minden évben a meglévő összeg 110 %-át adja (·1,1), két év alatt kétszer egymás után: ·1,1 · 1,1 = ·1,21.
+> Most visszafelé haladunk az időben: a 150 000 Ft-ból kell visszajutni a kezdőösszeghez, ezért az ellenkező művelet jön, **osztás**: 150 000 : 1,21 ≈ 123 967 Ft.
+> Józan ésszel: a betett pénz kevesebb, mint ami két év múlva lett belőle.
+> Ellenpróba: 123 967 · 1,1 = 136 364 Ft (1 év múlva), · 1,1 = 150 000 Ft (2 év múlva) ✓.
+>
+> **Ha 125 000 Ft-ot írt (150 000 : 1,2):** ez az egyszerű kamat logikája (2 év · 10 % = 20 %). Kamatos kamatnál a második évben már az első év kamata is kamatozik, ezért 1,1 · 1,1 = 1,21-gyel kell osztani, nem 1,2-del. Ellenpróba: 125 000 · 1,1 · 1,1 = 151 250 Ft, nem 150 000 Ft.
+
 ## 4. Válaszellenőrzés szabályai (FONTOS)
 
 A régi Excel-munkafüzet hibáiból tanulva:
