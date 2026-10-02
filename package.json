@@ -1,0 +1,1 @@
+{ "name": "gazdasagi-matek-gyakorlo", "private": true, "type": "module", "scripts": { "test": "node --test" } }
