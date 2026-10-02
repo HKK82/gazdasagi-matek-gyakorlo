@@ -7,7 +7,7 @@ Ez a fájl a megrendelő (oktató) igényeit és a teljes szakmai tartalmat írj
 - Böngészőben futó **gyakorlóoldal** a Kodolányi János Egyetem „Gazdasági matematika” tárgyához.
 - Felhasználók: felnőtt, levelezős hallgatók, sokan **nem matematikusok**. A hangnem barátságos, türelmes, magázó („Önök/Ön” helyett elég a semleges, felszólító forma: „Írja be…”, „Nézze meg…”).
 - Az oktató **online órán** is használja, ezért kivetítve is jól olvasható legyen (nagy betű, tiszta elrendezés).
-- Első verzió: **3 téma** (lent). Később újabb témák jönnek → a tartalom legyen könnyen bővíthető (téma = külön adatfájl/modul).
+- Első verzió (v1, kész): **3 téma**. **v2: 4. téma – Pénzügyi számítások (kamatos kamat)**, lásd 5.4. Később újabb témák jönnek → a tartalom legyen könnyen bővíthető (téma = külön adatfájl/modul).
 
 ## 2. Technikai keretek
 
@@ -54,7 +54,7 @@ A régi Excel-munkafüzet hibáiból tanulva:
 
 ### 4.3 Próbateszt
 
-- 10 véletlen feladat a 3 témából (arányosan), **20 perc** időkorlát az egész tesztre (nem feladatonként – ezt ki is írja).
+- 10 véletlen feladat az összes témából (arányosan; 4 témánál pl. 3/3/2/2), **20 perc** időkorlát az egész tesztre (nem feladatonként – ezt ki is írja).
 - Minden feladat végén: „Eredményként csak egyetlen számot adjon meg, pl. 8,2 (ha 8,2 %-ot szeretne beírni).”
 - Feladatok közt szabadon lehet lépkedni (bal oldali/felső sáv számokkal).
 - „Teszt beadása” → megerősítés → eredmény: pontszám, %, és feladatonként a helyes válasz + a megoldás levezetése.
@@ -183,6 +183,69 @@ A grafikonos feladatnál a rácsot és az egyenest **SVG**-vel rajzoljuk, tengel
 A kereslet–kínálat feladatnál egy **SVG ábra** mutassa a két egyenest és az egyensúlyi pontot (a megoldás után).
 
 ---
+
+### 5.4 Téma 4 – Pénzügyi számítások (kamatos kamat)  *(v2)*
+
+**Kulcsképlet (kiemelve, piros keretben – ez ennek a témának a „kályhája”, mindig ide térünk vissza):**
+
+> **PV · (1 + r/100)ⁿ = FV**
+> PV = jelenérték (*present value*, a mai pénz: betett összeg / felvett kölcsön), FV = jövőérték (*future value*: felnövekedett összeg / visszafizetendő összeg), r = éves kamatláb (%), n = kamatozó periódusok (évek) száma.
+> **(1 + r/100)** a **kamattényező** – nem r és nem r/100! (8 % → 1,08; 0,5 % → 1,005.)
+
+**Elmélet röviden:**
+- **Kamatos kamat:** a második évtől a korábbi kamat is kamatozik. Ezért évről évre a kamattényezővel szorzunk tovább: n év után a kamattényező **n-edik hatványával**.
+- A függvény **nem lineáris, hanem exponenciális**: a grafikonon a lépcsők (az éves kamatok) egyre nagyobbak, mert egyre nagyobb összegnek vesszük a 8 %-át. (Ábra: a 80 000 Ft · 1,08ⁿ értékei 0–20 évre, SVG-n, oszlopok vagy pontok.)
+- Mindig tudni kell, **melyik betű az ismeretlen**, és mit hová helyettesítünk – egy képlet, négy kérdéstípus:
+  1. **FV** ismeretlen → szorzás a kamattényező hatványával.
+  2. **PV** ismeretlen → **visszafelé haladunk az időben → osztás** a kamattényező hatványával (kisebb szám jön ki, mint FV).
+  3. **n** ismeretlen → osztás PV-vel, majd **logaritmus** („lecsalogatja a kitevőt”: lg(qⁿ) = n · lg q): n = lg(FV/PV) / lg(1 + r/100). Járható út a **próbálgatás** egész n-ekkel is.
+  4. **r** ismeretlen → osztás PV-vel, majd **n-edik gyök**: 1 + r/100 = ⁿ√(FV/PV); utána −1, ·100.
+- Egyenletnél **minden műveletet mindkét oldalon** el kell végezni (logaritmust is).
+- **Hitelnél ugyanez a képlet:** a felvett kölcsön a PV, a futamidő végén egy összegben visszafizetett összeg az FV.
+- **Évközi kamatozás:** az éves (**névleges**) kamatlábat **arányosítjuk**: havonta r/12, negyedévente r/4, félévente r/2; a periódusok száma ennyiszer több (pl. 7 hónap → 7. hatvány). Vigyázat a nullákkal: **fél % → 1,005** (két nulla), 5 % → 1,05, 0,05 % → 1,0005.
+- **Tényleges (effektív) éves kamatláb:** ha gyakrabban tőkésítenek, kicsit többet kapunk, mert hamarabb kezd kamatozni a kamat: r_tényleges = ((1 + r/(100·m))^m − 1) · 100. Gyakoribb tőkésítés → nagyobb, **de nem nő a végtelenségig** (18 %-nál a határ ≈ 19,72 %, e^0,18 − 1).
+- **Excelben:**
+  - jövőérték: `=80000*HATVÁNY(1,08;A2)` vagy soronként `=előző*1,08`;
+  - periódusszám: `=PER.SZÁM(ráta; részlet; jelenérték; jövőérték)`, pl. `=PER.SZÁM(0,05;0;-120000;186160)` → 9;
+  - kamatláb: `=RÁTA(időszakok; részlet; jelenérték; jövőérték)`, pl. `=RÁTA(6;0;-400000;520904)` → 4,5 %;
+  - **a jelenértéket és a jövőértéket ellentétes előjellel kell megadni** (az egyik pénz befelé, a másik kifelé áramlik), különben hibát ad;
+  - a rátát tizedes törtként (0,05) vagy %-ként (5%) kell beírni; a részlet itt 0 vagy üres.
+- **GeoGebrában** gyökvonás: a beviteli billentyűzet *f(x)* részén az n-edik gyök; tizedes**pont**tal (1.3022).
+
+**Kidolgozott példák (az eredeti diák és feladatlap):**
+1. **Jövőérték:** 80 000 Ft, 8 % → 1 év: 86 400 Ft; 2 év: 80 000 · 1,08² = **93 312 Ft**; 3 év: 100 776,96 ≈ **100 777 Ft**; n év: 80 000 · 1,08ⁿ; 20 év: ≈ **372 877 Ft** (a betét ~4,7-szerese). Exponenciális függvény.
+2. **Jelenérték:** 10 %, 2 év múlva 150 000 Ft → PV = 150 000 : 1,1² = 123 966,94 ≈ **123 967 Ft**.
+3. **Periódusszám:** 120 000 Ft, 5 %, kifizetés 186 160 Ft → 1,05ⁿ = 1,5513 → n = lg 1,5513 / lg 1,05 ≈ **9 év**. Excel: `=PER.SZÁM(0,05;0;-120000;186160)`.
+4. **Kamatláb:** 400 000 Ft → 6 év múlva 520 904 Ft → 1 + r/100 = ⁶√1,30226 ≈ 1,045 → **4,5 %**. Excel: `=RÁTA(6;0;-400000;520904)`.
+5. **Havi kamatozás:** 200 000 Ft, éves névleges 6 %, havonta → havi 0,5 % → 200 000 · 1,005⁷ = 207 105,88 ≈ **207 106 Ft** (7. hónap végén).
+6. **Tényleges kamatláb:** 100 000 Ft, névleges 18 %:
+
+   | tőkésítés | periódus-kamatláb | 1 év múlva | tényleges éves kamatláb |
+   |---|---|---|---|
+   | évente | 18 % | 118 000 Ft | 18 % |
+   | félévente | 9 % (2×) | 118 810 Ft | 18,81 % |
+   | negyedévente | 4,5 % (4×) | **119 252 Ft** | 19,25 % |
+   | havonta | 1,5 % (12×) | 119 562 Ft | 19,56 % |
+7. **Összetett – banki ajánlatok (13. feladat):** a) 12 %, 6 év, visszafizetés 10 658 643 Ft → PV = **5 400 000 Ft**; b) 6 millió, 4 év, 8 315 152 Ft → **8,5 %**; c) 5 millió, 9,8 %, 8 év → **10 563 035 Ft**; d) 5,8 millió, 10,2 %, 11 447 197 Ft → **7 év**; e) 5,2 millió, 3 év, havi kamatozás, névleges 12 % → 5,2 millió · 1,01³⁶ ≈ **7 439 998 Ft**, tényleges kamatláb **12,68 %**.
+
+**Gyakorló párok (a feladatlap páros feladatai – fix számokkal is legyenek elérhetők, ellenőrzött végeredménnyel):** 50 000 Ft, 3 %, 20 év → 90 305,56 ≈ 90 306 Ft; kölcsön 4 %, 5 év múlva 210 000 Ft → **172 605 Ft**; hitel 800 000 Ft, 3,5 %, visszafizetés 918 000 Ft → **4 év**; hitel 700 000 Ft, 5 év, 959 061 Ft → **6,5 %**; hitel 300 000 Ft, havi kamatozás, névleges 9,6 %, 5 hónap → 300 000 · 1,008⁵ ≈ **312 194 Ft**; 400 000 Ft, névleges 8,4 % → évente 433 600 (8,4 %), félévente 434 306 (8,58 %), negyedévente 434 673 (8,67 %), havonta 434 924 (8,73 %).
+
+**Feladattípusok (generátorok) és tipikus hibák:**
+
+| Típus | Feladat | Helyes | Tipikus hibás válasz → visszajelzés |
+|---|---|---|---|
+| P1 jövőérték | PV, r, n → FV (Ft, egészre) | PV·(1+r/100)ⁿ | **egyszerű kamat** PV·(1 + n·r/100) → „Ez egyszerű kamat lenne; kamatos kamatnál a kamat is kamatozik → hatvány.”; PV·(1+r)ⁿ (r nem osztva 100-zal) → „A kamattényező 1 + r/100, pl. 8 % → 1,08, nem 9.”; csak 1 év (PV·(1+r/100)) |
+| P2 jelenérték (betét vagy kölcsön) | FV, r, n → PV (Ft, egészre) | FV : (1+r/100)ⁿ | FV·(1+r/100)ⁿ → „Visszafelé halad az időben → osztás; a jelenérték kisebb, mint a jövőérték.”; FV·(1−r/100)ⁿ → „Nem csökkenéssel szorzunk, hanem a kamattényező hatványával osztunk.” |
+| P3 periódusszám | PV, FV, r → n (év, egészre) | lg(FV/PV)/lg(1+r/100) | FV/PV/(r/100)-féle lineáris becslés → „Kamatos kamatnál logaritmus (vagy próbálgatás egész évekkel).” |
+| P4 kamatláb | PV, FV, n → r (% , 1 tizedes) | (ⁿ√(FV/PV) − 1)·100 | (FV/PV − 1)·100/n (átlagos egyszerű kamat) → „Ez az évi átlagos növekedés egyszerű kamattal; kamatos kamatnál n-edik gyököt kell vonni.”; (FV/PV−1)·100 (a teljes növekedés) → „Ez az egész időszak alatti növekedés, nem az éves kamatláb.” |
+| P5 évközi kamatozás | PV, éves névleges r, havi/negyedéves/féléves tőkésítés, időtartam hónapokban → FV (Ft, egészre) | PV·(1+r/(100m))^k | éves r-rel számol periódusonként → „Az éves kamatlábat arányosítani kell: havonta r/12.”; rossz tizedes nullák (pl. 1,05 vagy 1,0005 a 1,005 helyett) → „Fél százalék = 0,005 → 1,005 (két nulla).”; egyszerű kamat PV·(1+r·t) |
+| P6 tényleges kamatláb | névleges r, tőkésítések száma m → tényleges % (2 tizedes) | ((1+r/(100m))^m − 1)·100 | a névleges r → „Ez a névleges kamatláb; gyakoribb tőkésítésnél a tényleges egy kicsit több.” |
+| P7 kamattényező | „p %-os kamat/növekedés → mennyi a szorzó?” (gyors, egy szám) | 1 + p/100 | p/100 vs. rossz nullák → célzott üzenet (Ilona kedvenc csapdája: 0,5 % → 1,005) |
+| P8 vegyes „banki ajánlat” | véletlenszerűen P1–P6 egy hitel-történetbe ágyazva | — | a megfelelő típus üzenetei |
+
+**Számtartományok és kerekítés:** PV 10 000 – 10 000 000 Ft (szép, kerek számok), r 1–20 % (egész vagy fél), n 1–30 év, évközi m ∈ {2, 4, 12}. Ft-ban **egészre kerekítve**, kamatláb **1 tizedesre**, tényleges kamatláb **2 tizedesre**, periódusszám **egészre**. A P3/P4 generátor úgy készüljön, hogy FV-t egész n-ből / szép r-ből számolja és Ft-ra kerekíti; az ellenőrzés a kerekített FV-ből visszaszámolt értékre is legyen toleráns (pl. 3,9994 → 4 év). A Ft-os válaszoknál ±1 Ft eltérés is elfogadható (kerekítési különbség), egy megjegyzéssel.
+
+**Ábra:** a témaoldalon (Elmélet) egy SVG mutassa a kamatos kamat (exponenciális) és az egyszerű kamat (lineáris) növekedését ugyanarra a betétre, 0–20 évre – így látszik, hogy a kamatos kamat lépcsői egyre nagyobbak.
 
 ## 6. Megjelenés
 
