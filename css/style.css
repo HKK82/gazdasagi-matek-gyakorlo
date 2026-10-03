@@ -356,3 +356,25 @@ dialog::backdrop { background: rgba(0, 0, 0, .45); }
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; }
 }
+
+/* ---- AI-asszisztens ---- */
+.ai-panel { border: 2px solid var(--keret); border-radius: 10px; background: var(--felulet); margin: .9rem 0; padding: .1rem .9rem; }
+.ai-panel > summary { cursor: pointer; font-weight: 700; padding: .6rem 0; }
+.ai-chat[hidden], .ai-nincs-kulcs[hidden] { display: none; }
+.ai-uzenetek { display: grid; gap: .6rem; margin: .75rem 0; max-height: 28rem; overflow-y: auto; }
+.ai-uzenetek:empty { display: none; }
+.ai-sor { padding: .55rem .75rem; border-radius: 10px; }
+.ai-en { background: var(--kiemel-halvany); }
+.ai-gep { background: var(--felulet-2); border: 1px solid var(--keret); }
+.ai-valasz p { margin: .4rem 0; }
+.ai-valasz ul { margin: .4rem 0; padding-left: 1.3rem; }
+.ai-modell { display: block; color: var(--halvany); margin-top: .3rem; }
+.ai-bevitel { display: flex; gap: .5rem; align-items: stretch; }
+.ai-bevitel textarea { flex: 1; font: inherit; min-height: 3.2rem; padding: .4rem .6rem; border: 2px solid var(--keret); border-radius: 8px; background: var(--felulet); color: var(--szoveg); resize: vertical; }
+.ai-bevitel textarea:focus { border-color: var(--kiemel); }
+.lepesek-lista li { margin: .5rem 0; }
+.gyik dt { font-weight: 700; margin-top: .75rem; }
+.gyik dd { margin: .2rem 0 0; }
+code { background: var(--felulet-2); padding: .05rem .3rem; border-radius: 4px; }
+@media (max-width: 30rem) { .ai-bevitel { flex-direction: column; } }
+#kulcsMezo { max-width: 30rem !important; }

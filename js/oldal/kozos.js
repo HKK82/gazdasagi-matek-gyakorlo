@@ -52,4 +52,9 @@ export function el(tag, attr = {}, ...gyerekek) {
   return e;
 }
 
+/** HTML → sima szöveg (az AI-nak szánt kontextushoz). */
+export function szovegbol(html) {
+  return String(html ?? '').replace(/<[^>]+>/g, '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 nagyBetuInit();

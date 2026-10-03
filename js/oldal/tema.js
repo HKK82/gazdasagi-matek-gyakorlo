@@ -1,8 +1,9 @@
 // Témaoldal: Elmélet röviden – Kidolgozott példák – Gyakorlás (fülekkel).
-import { el } from './kozos.js';
+import { el, szovegbol } from './kozos.js';
+import { aiPanel } from './ai-panel.js';
 import { mezokRajzol, abraElem, miertElem } from './feladat-nezet.js';
 import { temaKeres, TEMAK } from '../temak/index.js';
-import { ellenoriz, helyesE } from '../lib/ellenorzo.js';
+import { ellenoriz, helyesE, helyesValaszSzoveg } from '../lib/ellenorzo.js';
 import { ujRng, valaszt } from '../lib/rng.js';
 import { rogzit, tipusAllapot, megy, MEGY_HATAR } from '../lib/haladas.js';
 
@@ -130,8 +131,36 @@ function ujFeladat(fokuszal = true) {
   if (fokuszal) gy.nezet.mezok[0].fokusz();
 }
 
+/** Az AI-asszisztensnek átadott kontextus: a feladat és a hallgató aktuális állapota. */
+function aiKontextus() {
+  const f = gy.feladat;
+  const valaszok = gy.nezet.mezok.map((m) => {
+    const v = String(m.ertek()).trim();
+    return v ? `${m.mezo.cimke} = ${v}` : '';
+  }).filter(Boolean).join('; ');
+  const mutatva = gy.megoldasMutatva;
+  return {
+    temaCim: tema.cim,
+    tipusNev: `${gy.tipus.id} – ${gy.tipus.nev}`,
+    kulcskeplet: szovegbol(tema.kulcskeplet),
+    feladat: szovegbol(`${f.szoveg} ${f.utasitas || ''}`),
+    mezok: f.mezok.map((m) => m.cimke),
+    valaszok,
+    visszajelzes: gy.utolsoVisszajelzes,
+    probalkozasok: gy.hibas,
+    segitsegiSzint: Math.min(5, 1 + gy.hibas + Math.min(gy.tippSzint, 2)),
+    megoldasLatta: mutatva,
+    helyesValasz: f.mezok.map((m) => `${m.cimke}: ${helyesValaszSzoveg(m)}`).join('; '),
+    megoldasLepesek: f.megoldas.map((l, i) => `${i + 1}. ${szovegbol(l)}`).join('\n'),
+    hivatalosMagyarazat: (f.magyarazat || []).map(szovegbol).join('\n'),
+  };
+}
+
 function feladatRajzol() {
   const f = gy.feladat;
+  gy.hibas = 0;
+  gy.utolsoVisszajelzes = '';
+  gy.megoldasMutatva = false;
   const nezet = mezokRajzol(f);
   gy.nezet = nezet;
   const osszesito = el('div', { class: 'osszesito', role: 'status', 'aria-live': 'polite' });
@@ -166,6 +195,7 @@ function feladatRajzol() {
   megoldasGomb.addEventListener('click', () => {
     megoldas.hidden = false;
     megoldasGomb.disabled = true;
+    gy.megoldasMutatva = true;
     if (miert) { miert.hidden = false; miert.open = true; }
     if (!gy.rogzitve) {
       gy.megoldasLatta = true;
@@ -198,7 +228,7 @@ function feladatRajzol() {
     el('p', { class: 'feladat-szoveg', html: f.szoveg }),
     f.utasitas ? el('p', { class: 'utasitas', text: f.utasitas }) : null,
     abraElem(f.abra),
-    urlap, osszesito, tippLista, megoldas, miert));
+    urlap, osszesito, tippLista, megoldas, miert, aiPanel(aiKontextus)));
   gy.miert = miert;
 }
 
@@ -213,6 +243,12 @@ function ellenorzes(osszesito) {
     else m.beallit(eredmenyek[i]);
   });
 
+  gy.utolsoVisszajelzes = eredmenyek.map((e, i) => {
+    const cimke = gy.nezet.mezok[i].mezo.cimke;
+    if (helyesE(e)) return `${cimke}: helyes`;
+    return `${cimke}: ${e.allapot === 'tipikus' ? 'tipikus hiba – ' + e.uzenet : e.allapot === 'rossz' ? 'hibás' : e.uzenet}${e.ellenproba ? ' ' + e.ellenproba : ''}`;
+  }).join(' | ');
+  if (hibas) gy.hibas++;
   osszesito.className = 'osszesito';
   if (mindJo) {
     let sorozatUzenet = '';

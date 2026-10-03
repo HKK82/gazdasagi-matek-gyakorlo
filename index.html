@@ -23,6 +23,7 @@
           <li><a href="tema.html?t=kozgazdasag">Közgazdasági alkalmazás</a></li>
           <li><a href="tema.html?t=penzugy">Pénzügyi számítások</a></li>
           <li><a href="teszt.html">Próbateszt</a></li>
+          <li><a href="ai.html">AI-asszisztens</a></li>
           <li><button type="button" class="gomb halk kapcsolo" id="nagyBetu" aria-pressed="false">Nagy betű</button></li>
         </ul>
       </nav>
@@ -39,6 +40,11 @@
       <p>10 véletlen feladat a négy témából, <strong>20 perc</strong> az egész tesztre. Akárhányszor újraindítható, mindig új számokkal.</p>
       <p id="legjobb" class="figyelmeztetes"></p>
       <a class="gomb elsodleges" href="teszt.html">Próbateszt indítása</a>
+    </section>
+    <section class="doboz" aria-labelledby="aiCim">
+      <h2 id="aiCim">AI-asszisztens (opcionális)</h2>
+      <p>Saját, ingyenes Google Gemini API-kulccsal a gyakorlásnál egy AI-tanár is elmagyarázza a feladatot, és megmutatja, miért hibás a válasz. Az útmutató végigvezeti a kulcs kérésén.</p>
+      <a class="gomb" href="ai.html">Útmutató és beállítás</a>
     </section>
     <details class="doboz">
       <summary>Hogyan írja be a választ?</summary>
@@ -58,7 +64,7 @@
     </details>
   </main>
   <footer class="labjegyzet">
-    <p>Gyakorlóoldal a Gazdasági matematika tárgyhoz. Nincs belépés és nincs adatgyűjtés: a haladás csak ebben a böngészőben tárolódik.</p>
+    <p>Gyakorlóoldal a Gazdasági matematika tárgyhoz. Nincs belépés és nincs adatgyűjtés: a haladás csak ebben a böngészőben tárolódik. Az AI-asszisztens opcionális: csak saját API-kulccsal, az Ön kérdésére küld adatot a Google Gemini felé.</p>
   </footer>
   <script type="module" src="js/oldal/kezdo.js"></script>
 </body>

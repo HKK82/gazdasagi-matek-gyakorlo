@@ -11,14 +11,24 @@ Négy téma: **százalékszámítás**, **lineáris függvények**, **lineáris 
 - Statikus HTML + CSS + vanilla JavaScript (ES modulok); nincs build lépés és nincs npm-függőség.
 - A részletes megrendelői leírás: [SPEC.md](SPEC.md).
 
+## AI-asszisztens (opcionális)
+
+A Gyakorlás fülön minden feladat alatt megnyitható egy AI-panel (Google Gemini), amely a feladat és a hallgató beírt válasza alapján magyaráz, rávezet, megmutatja számokkal a hiba okát. Működéséhez a hallgatónak **saját, ingyenes Gemini API-kulcs** kell; az `ai.html` oldal lépésről lépésre bemutatja, hogyan kérhet ilyet, és itt lehet kipróbálni.
+
+- A kulcs csak a hallgató böngészőjében marad (alapból `sessionStorage`, kérésre `localStorage`), a kérés fejlécében megy a Google felé. Szervert nem használunk, adatot nem gyűjtünk. Automatikus hívás nincs, a próbatesztben nincs AI.
+- Modellek (`js/lib/gemini.js`, `MODELLEK`): olcsó „flash-lite” modellek sorban, mert ezekhez tartozik a legtöbb ingyenes kérés; 429/404/5xx esetén a következő modellt próbálja. A Google modellnevei változhatnak: ilyenkor elég a listát módosítani.
+- A rendszerutasítás a SPEC 3.2 hangnemében íródott; a helyes végeredményt csak a rendszerutasításban kapja meg a modell, és csak a megoldás megnézése után / kérésre árulhatja el.
+- A válasz megjelenítése biztonságos (`textContent`, csak **vastag**, `kód` és felsorolás jelölés).
+
 ## Felépítés
 
 ```
 index.html            kezdőoldal (témakártyák, haladás, próbateszt)
 tema.html?t=<id>      témaoldal: Elmélet röviden / Kidolgozott példák / Gyakorlás
 teszt.html            próbateszt
+ai.html               AI-asszisztens: útmutató az API-kulcshoz és beállítás
 css/style.css         megjelenés (világos/sötét téma, „Nagy betű” mód)
-js/lib/               számkezelés, válaszellenőrző, SVG-ábra, haladás, tesztösszeállító
+js/lib/               számkezelés, válaszellenőrző, SVG-ábra, haladás, tesztösszeállító, Gemini-kliens, kulcstárolás
 js/temak/             témák (egy téma = egy modul) + index.js (nyilvántartás)
 js/oldal/             az egyes oldalak kezelőkódja
 tests/                node --test egységtesztek
@@ -48,6 +58,7 @@ A tesztek ellenőrzik:
 - **minden feladattípusból 300 generált feladatot**: a helyes választ a feladat *szövegéből* (a grafikonos feladatnál az SVG-ábrából) visszaolvasott számokból, a generátortól függetlenül újraszámolják; a szövegben csak „szép” (legfeljebb 2 tizedes) számok vannak; a tipikus hibás válaszok különböznek a jótól, és beírva a célzott visszajelzést adják;
 - a SPEC kidolgozott példáinak végeredményeit (a 4. témánál a gyakorló párok és a banki ajánlatok fix feladatait is);
 - minden típus magyarázatát, ellenpróbáját és rávezető első tippjét (`tests/magyarazat.test.js`), a pénzügyi téma generátorait külön (`tests/penzugy.test.js`);
+- az AI-klienst hálózat nélkül (`tests/gemini.test.js`): a kulcs csak a fejlécben megy, modellváltás kvótahibánál, hibaüzenetek, kulcstárolás, biztonságos megjelenítés;
 - a próbateszt összeállítását (10 feladat, 3/3/2/2 arány, egyetlen számmező) és a haladás mentését (tároló nélkül is).
 
 ## Új téma hozzáadása

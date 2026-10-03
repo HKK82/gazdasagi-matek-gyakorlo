@@ -15,7 +15,7 @@ Ez a fájl a megrendelő (oktató) igényeit és a teljes szakmai tartalmat írj
 - Csak HTML + CSS + vanilla JavaScript (ES modulok). **Nincs build lépés, nincs npm-függőség** a futtatáshoz.
 - Külső könyvtár nem kell. Ha mégis (pl. képletekhez KaTeX), csak megbízható CDN-ről, rögzített verzióval – de előnyben a sima HTML (`<sub>`, `·`, `−`).
 - **Belépés nincs.** A haladás csak a hallgató saját böngészőjében (`localStorage`) mentődik; ha nem elérhető, az oldal akkor is működjön.
-- **Nincs adatgyűjtés**, nincs analitika, nincs külső kérés.
+- **Nincs adatgyűjtés**, nincs analitika, nincs külső kérés – kivéve az opcionális AI-asszisztenst (9. fejezet), amely csak a hallgató saját API-kulcsával, az ő kérésére küld adatot a Google Gemini felé.
 - Magyar felület, magyar számformátum (tizedesvessző a kijelzésben).
 - Reszponzív: telefonon is használható (min. 360 px szélesség), vízszintes görgetés nélkül.
 - Világos és sötét téma (`prefers-color-scheme`).
@@ -300,3 +300,12 @@ A kereslet–kínálat feladatnál egy **SVG ábra** mutassa a két egyenest és
 
 - `README.md`: rövid leírás, a GitHub Pages link helye, hogyan lehet új témát hozzáadni (adatfájl szerkezete), hogyan futnak a tesztek (`node --test`).
 - A munka egy külön ágon készüljön, és **pull request** formájában kerüljön a `main` ágra, rövid magyar leírással és képernyőképekkel/leírással arról, mi készült el.
+
+## 9. AI-asszisztens (v3, opcionális)
+
+- A Gyakorlás fülön feladatonként nyitható „🤖 AI-asszisztens” panel: gyorsgombok („Magyarázd el másképp”, „Miért hibás a válaszom?”, „Adj egy tippet”) és szabad kérdés.
+- **Saját, ingyenes Gemini API-kulcs** kell. Az `ai.html` oldalon magyar útmutató (Google AI Studio → API-kulcs létrehozása), kulcs mentése / kipróbálása / törlése, adatvédelmi és hibaelhárítási tudnivalók.
+- A kulcs csak a böngészőben marad (alapból munkamenetben, kérésre megjegyezve), csak a Google felé megy, fejlécben. Nincs szerver, nincs automatikus hívás, a próbatesztben nincs AI.
+- Az ingyenes szinten legtöbb kérést adó „flash-lite” modellek; kvótahibánál automatikus váltás a következő modellre.
+- Az AI a 3.2 szerinti hangnemben és szerkezetben magyaráz (konkrét számok, 100-zal szemléltetés, józan ész ellenőrzés, saját számmal ellenpróba, első lépésben rávezető kérdés), a végeredményt csak a megoldás megnézése után vagy kérésre mondja meg. A helyességet továbbra is az oldal ellenőrzője dönti el.
+- Az AI-válasz megjelenítése nem HTML: csak szöveg, **vastag**, `kód`, felsorolás.
