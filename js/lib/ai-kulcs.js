@@ -42,11 +42,15 @@ export function kulcsTorol() {
   torol(tartos, KULCS_TARTOS);
 }
 
-/** Gyors alakellenőrzés (nem garancia): a Google-kulcsok „AIza…” kezdetűek, ~39 karakteresek. */
+/**
+ * Gyors alakellenőrzés – szándékosan engedékeny, mert a Google kulcsformátuma változhat
+ * (a régi kulcsok „AIza…” kezdetűek, de újabb formátumok is léteznek). Csak a nyilvánvaló
+ * másolási hibákat szűri ki; hogy a kulcs tényleg jó-e, a „Kulcs kipróbálása” dönti el.
+ */
 export function kulcsAlakja(kulcs) {
   const k = String(kulcs || '').trim();
   if (!k) return { ok: false, uzenet: 'Még nem írt be kulcsot.' };
   if (/\s/.test(k)) return { ok: false, uzenet: 'A kulcsban nem lehet szóköz – másolja be újra, felesleges karakterek nélkül.' };
-  if (!/^AIza[0-9A-Za-z_-]{30,}$/.test(k)) return { ok: false, uzenet: 'Ez nem úgy néz ki, mint egy Gemini API-kulcs. A kulcs „AIza” betűkkel kezdődik, és kb. 39 karakter hosszú.' };
+  if (k.length < 20 || !/^[0-9A-Za-z_.\-]+$/.test(k)) return { ok: false, uzenet: 'Ez nem tűnik teljes API-kulcsnak. Másolja ki újra a teljes kulcsot az AI Studióból (a másolás ikonnal).' };
   return { ok: true, uzenet: '' };
 }
