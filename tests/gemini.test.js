@@ -174,11 +174,16 @@ test('kulcstárolás: tiltott / hibás tárolóval sem dől el', () => {
   beallitKulcsTarolo(null);
 });
 
-test('kulcs alakellenőrzés: üres, szóközös, rossz alakú és helyes kulcs', () => {
+test('kulcs alakellenőrzés: csak a nyilvánvaló másolási hibákat szűri, a formátumot nem erőlteti', () => {
   assert.equal(kulcsAlakja('').ok, false);
   assert.match(kulcsAlakja('AIza abc').uzenet, /szóköz/);
-  assert.match(kulcsAlakja('sk-nem-google-kulcs-1234567890123456').uzenet, /AIza/);
+  assert.match(kulcsAlakja('rövid').uzenet, /teljes/);
+  assert.equal(kulcsAlakja('árvíztűrő-tükörfúrógép-123456').ok, false);
   assert.equal(kulcsAlakja(KULCS).ok, true);
+  assert.equal(kulcsAlakja(`  ${KULCS}  `).ok, true);
+  // más (újabb) kulcsformátumokat sem utasít el
+  assert.equal(kulcsAlakja('AQ.Ab8RN6Kexamplekey_1234567890-abcdefghijk').ok, true);
+  assert.equal(kulcsAlakja('sk-nem-google-de-hosszu-kulcs-1234567890').ok, true);
 });
 
 // ---- az AI válaszának biztonságos jelölése ----
