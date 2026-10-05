@@ -37,6 +37,18 @@ test('a kidolgozott példák szövegében a SPEC végeredményei szerepelnek', (
     '118 810', '119 252', '119 562', '18,81 %', '19,25 %', '19,56 %', '19,72 %', '5 400 000 Ft', '8,5 %', '10 563 035 Ft', '7 év', '7 439 998 Ft', '12,68 %']) {
     assert.ok(p.includes(v), v);
   }
+  const e = szoveg('exponencialis');
+  for (const v of ['19', '18,05', '17,15', '1036 Ft', '≈ 5,93', '6 év', '11,9 év', '17,8 év', '69 év', '118,3', '2099-ben', '2003-ban', '+3,1 %/év', '12,0 millió tonna', '−0,64 %/év', '65,9 millió Ft']) {
+    assert.ok(e.includes(v), v);
+  }
+  const g = szoveg('fuggvenyvizsgalat');
+  for (const v of ['50 db, 24 000 €', '10 db (−8 000 €)', '10 &lt; x &lt; 50', '23,05', '67,6', '24–67 db', '41,2', '57,7', '42–57 db', '70 db, 19 500 €', '20 &lt; x &lt; 70', '52–84 db', '58–80 db', '50 db, 850 €/db', '19,1', '130,9', '20–130 db', '851,7', '867,8', '+16,1 €/db', '+1,9 %']) {
+    assert.ok(g.includes(v), v);
+  }
+  const v7 = szoveg('valoszinuseg');
+  for (const v of ['1/36', '0,16', '0,48', '0,36', '6 €', '3,2 €', '0,05', '0,45', '0,5', '−9 €', '0,3', '0,21', '0,49', '−10,4 €', '0,25', '10,4 €', '0,0625', '0,375', '0,5625', '−6 €', '0,2', '0,16', '0,64', '−9,6 €']) {
+    assert.ok(v7.includes(v), v);
+  }
   const k = szoveg('kozgazdasag');
   for (const v of ['x = 2,5 km', '2830 Ft', '2900 Ft', 'x = 5 km', '1850 Ft', 'x < 5 km', 'D(p) = −2p + 1500', '1100 liter', 'p = 150 Ft', 'x = 3 $/kg', '4 t', '12 000 $', '8750 $', '12 480 $']) {
     assert.ok(k.includes(v), v);

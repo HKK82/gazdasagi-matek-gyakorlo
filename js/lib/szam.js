@@ -79,6 +79,7 @@ export function ertelmez(bevitel) {
   const szamResz = m[1].replace(/^([+-])\s+/, '$1').trim();
   const utotag = m[2];
   if (!UTOTAG.test(utotag)) return { hiba: utotag.match(/[*+\-:/()^]/) ? 'keplet' : 'ervenytelen' };
+  if (/^\s*\/\s*$/.test(utotag)) return { hiba: 'ervenytelen' }; // csonka tört: „3/”
 
   // egyszerű tört: -1/3
   const tort = szamResz.match(/^([+-]?)(\d+)\s*\/\s*(\d+)$/);

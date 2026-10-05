@@ -1,12 +1,14 @@
 # Gazdasági matematika – gyakorló
 
 Böngészőben futó gyakorlóoldal a Kodolányi János Egyetem *Gazdasági matematika* tárgyához.
-Négy téma: **százalékszámítás**, **lineáris függvények**, **lineáris függvények közgazdasági alkalmazása**,
-**pénzügyi számítások (kamatos kamat)**, valamint egy 10 feladatos, 20 perces **próbateszt**.
+Hét téma: **százalékszámítás**, **lineáris függvények**, **lineáris függvények közgazdasági alkalmazása**,
+**pénzügyi számítások (kamatos kamat)**, **exponenciális függvények**, **közgazdasági függvények vizsgálata**
+(harmadfokú profit-, átlagköltség-függvény) és **klasszikus valószínűség / várható érték**, valamint egy 10 feladatos, 20 perces **próbateszt**.
 
 **Élő oldal (GitHub Pages):** https://hkk82.github.io/gazdasagi-matek-gyakorlo/
 
 - Nincs belépés, nincs adatgyűjtés, nincs külső kérés. A haladás csak a hallgató böngészőjében (`localStorage`) mentődik.
+- Az 5. és 6. téma feladatainál lenyitható **„GeoGebrában így”** doboz mutatja a kimásolható beírandó sorokat (a GeoGebra nincs beágyazva, nincs külső kérés); a megoldás után SVG-ábra mutatja a függvényt és a keresett pontot.
 - Minden feladattípushoz **„Miért így?” szöveges magyarázat**, hibás válaszra **számszerű ellenpróba** (a hallgató saját számával), és kérdés formájú első tipp tartozik.
 - Statikus HTML + CSS + vanilla JavaScript (ES modulok); nincs build lépés és nincs npm-függőség.
 - A részletes megrendelői leírás: [SPEC.md](SPEC.md).
@@ -29,7 +31,7 @@ teszt.html            próbateszt
 ai.html               AI-asszisztens: útmutató az API-kulcshoz és beállítás
 css/style.css         megjelenés (világos/sötét téma, „Nagy betű” mód)
 js/lib/               számkezelés, válaszellenőrző, SVG-ábra, haladás, tesztösszeállító, Gemini-kliens, kulcstárolás
-js/temak/             témák (egy téma = egy modul) + index.js (nyilvántartás)
+js/temak/             témák (egy téma = egy modul: szazalek, linearis, kozgazdasag, penzugy, exponencialis, fuggvenyvizsgalat, valoszinuseg) + index.js
 js/oldal/             az egyes oldalak kezelőkódja
 tests/                node --test egységtesztek
 ```
@@ -59,7 +61,8 @@ A tesztek ellenőrzik:
 - a SPEC kidolgozott példáinak végeredményeit (a 4. témánál a gyakorló párok és a banki ajánlatok fix feladatait is);
 - minden típus magyarázatát, ellenpróbáját és rávezető első tippjét (`tests/magyarazat.test.js`), a pénzügyi téma generátorait külön (`tests/penzugy.test.js`);
 - az AI-klienst hálózat nélkül (`tests/gemini.test.js`): a kulcs csak a fejlécben megy, modellváltás kvótahibánál, hibaüzenetek, kulcstárolás, biztonságos megjelenítés;
-- a próbateszt összeállítását (10 feladat, 3/3/2/2 arány, egyetlen számmező) és a haladás mentését (tároló nélkül is).
+- a 4–7. témát a saját, független fájljában (`penzugy`, `exponencialis`, `fuggvenyvizsgalat`, `valoszinuseg`): a darabszám-határokat egész értékek behelyettesítésével, a valószínűségeket tört alakban is;
+- a próbateszt összeállítását (10 feladat, 7 témából legalább 1, legfeljebb 2 témánként, egyetlen számmező) és a haladás mentését (tároló nélkül is).
 
 ## Új téma hozzáadása
 
@@ -96,6 +99,7 @@ export default {
   ],
   tippek: ['1. szint – mindig kérdés, ami rávezet', '2. szint', '3. szint'],
   magyarazat: ['„Miért így?” – 3–5 bekezdés szavakkal, a feladat számaival (HTML)'],
+  geogebra?: { sorok: ['f(x)=100*1.124^x', 'f(20)'], megjegyzes?: '…' },   // „GeoGebrában így” doboz (tizedespont!)
   megoldas: ['1. lépés', '2. lépés'],
   jegyezze: '„Ezt jegyezze meg” mondat a típushoz.',
 }

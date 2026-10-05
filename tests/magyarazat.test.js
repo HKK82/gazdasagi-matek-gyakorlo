@@ -7,6 +7,7 @@ import { formaz } from '../js/lib/szam.js';
 import { ellenoriz, valasztoMezo } from '../js/lib/ellenorzo.js';
 import { TEMAK } from '../js/temak/index.js';
 import { sima, szamok } from './segito.js';
+import { evben } from '../js/temak/seged.js';
 
 const MINTA = 120;
 const mondatSzam = (szoveg) => (sima(szoveg).match(/[.!?](?=\s|$)/g) || []).length;
@@ -23,7 +24,11 @@ const SZAM_RAGOZAS = /(?<![\d,.])(\d+)-(ed|ad|et|at|ot|ból|ből|ba|be|ban|ben|n
 const EGYSEG_RAGOZAS = /\b(perc|óra|liter|tonna|hónap)-\p{L}+/u;
 const rosszRagozas = (szoveg) => {
   const t = sima(szoveg);
-  for (const m of t.matchAll(SZAM_RAGOZAS)) if (!['0', '1', '100'].includes(m[1]) && !['2023-ban', '2024-ben'].includes(m[0])) return m[0];
+  for (const m of t.matchAll(SZAM_RAGOZAS)) {
+    if (['0', '1', '100'].includes(m[1]) || ['2023-ban', '2024-ben'].includes(m[0])) continue;
+    if (/^(19|20)\d\d$/.test(m[1]) && ['ban', 'ben'].includes(m[2]) && evben(Number(m[1])) === m[0]) continue; // évszám: a toldalék a kiejtés szerint helyes
+    return m[0];
+  }
   return t.match(EGYSEG_RAGOZAS)?.[0] || null;
 };
 
@@ -44,7 +49,7 @@ for (const tema of TEMAK) {
         const maximum = tipus.id === 'T10' ? 18 : 14;
         assert.ok(db >= 4 && db <= maximum, `a magyarázat 4–${maximum} mondat (most ${db}) – ${nev}`);
         assert.match(sima(szoveg), /Józan ésszel/, `józan ész ellenőrzés – ${nev}`);
-        assert.equal(rosszRagozas(szoveg), null, `hibás ragozás a magyarázatban – ${nev}`);
+        assert.equal(rosszRagozas(szoveg), null, `hibás ragozás a magyarázatban (${rosszRagozas(szoveg)}) – ${nev}`);
         // a feladat konkrét számaival: a szövegből vagy a helyes válaszokból legalább egy szerepel
         const sz = normal(sima(szoveg));
         const feladatSzamok = szamok(f.szoveg).map((v) => formaz(v, 2));

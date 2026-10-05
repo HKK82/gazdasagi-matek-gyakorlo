@@ -7,21 +7,21 @@ import * as haladas from '../js/lib/haladas.js';
 import { ellenoriz, helyesValaszSzoveg } from '../js/lib/ellenorzo.js';
 import { formaz } from '../js/lib/szam.js';
 
-test('próbateszt: 10 feladat, 20 perc, arányos elosztás a 4 témából (3/3/2/2)', () => {
+test('próbateszt: 10 feladat, 20 perc, arányos elosztás a 7 témából (minden témából legalább 1, legfeljebb 2)', () => {
   assert.equal(TESZT_DB, 10);
   assert.equal(TESZT_PERC, 20);
   for (let mag = 1; mag <= 200; mag++) {
     const rng = ujRng(mag);
-    const db = elosztas(rng, 4, 10);
+    const db = elosztas(rng, 7, 10);
     assert.equal(db.reduce((a, b) => a + b, 0), 10);
-    assert.deepEqual([...db].sort(), [2, 2, 3, 3]);
-    const db3 = elosztas(ujRng(mag), 3, 10);
-    assert.deepEqual([...db3].sort(), [3, 3, 4]);
+    assert.deepEqual([...db].sort(), [1, 1, 1, 1, 2, 2, 2]);
+    assert.deepEqual([...elosztas(ujRng(mag), 4, 10)].sort(), [2, 2, 3, 3]);
+    assert.deepEqual([...elosztas(ujRng(mag), 3, 10)].sort(), [3, 3, 4]);
     const lista = tesztFeladatok(ujRng(mag), TEMAK, 10);
     assert.equal(lista.length, 10);
     for (const t of TEMAK) {
       const n = lista.filter((x) => x.temaId === t.id).length;
-      assert.ok(n === 2 || n === 3);
+      assert.ok(n === 1 || n === 2, `${t.id}: ${n} feladat`);
     }
     for (const { feladat } of lista) {
       assert.equal(feladat.mezok.length, 1, 'egyetlen számot kell beírni');
