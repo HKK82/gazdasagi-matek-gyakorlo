@@ -7,7 +7,7 @@ Ez a fájl a megrendelő (oktató) igényeit és a teljes szakmai tartalmat írj
 - Böngészőben futó **gyakorlóoldal** a Kodolányi János Egyetem „Gazdasági matematika” tárgyához.
 - Felhasználók: felnőtt, levelezős hallgatók, sokan **nem matematikusok**. A hangnem barátságos, türelmes, magázó („Önök/Ön” helyett elég a semleges, felszólító forma: „Írja be…”, „Nézze meg…”).
 - Az oktató **online órán** is használja, ezért kivetítve is jól olvasható legyen (nagy betű, tiszta elrendezés).
-- Első verzió (v1, kész): **3 téma**. **v2: 4. téma – Pénzügyi számítások (kamatos kamat)**, lásd 5.4. Később újabb témák jönnek → a tartalom legyen könnyen bővíthető (téma = külön adatfájl/modul).
+- Első verzió (v1, kész): **3 téma**. **v2 (kész): 4. téma – Pénzügyi számítások (kamatos kamat)**, lásd 5.4. **v4: 5. Exponenciális függvények, 6. Közgazdasági függvények vizsgálata, 7. Klasszikus valószínűség és valószínűségi változó**, lásd 5.5–5.7. Később újabb témák jönnek (mintavétel, normális eloszlás, döntéselmélet) → a tartalom legyen könnyen bővíthető (téma = külön adatfájl/modul).
 
 ## 2. Technikai keretek
 
@@ -91,7 +91,7 @@ A régi Excel-munkafüzet hibáiból tanulva:
 
 ### 4.3 Próbateszt
 
-- 10 véletlen feladat az összes témából (arányosan; 4 témánál pl. 3/3/2/2), **20 perc** időkorlát az egész tesztre (nem feladatonként – ezt ki is írja).
+- 10 véletlen feladat az összes témából (arányosan; 4 témánál pl. 3/3/2/2; 7 témánál minden témából legalább 1, a maradék 3 véletlenszerűen, egy témából legfeljebb 2), **20 perc** időkorlát az egész tesztre (nem feladatonként – ezt ki is írja).
 - Minden feladat végén: „Eredményként csak egyetlen számot adjon meg, pl. 8,2 (ha 8,2 %-ot szeretne beírni).”
 - Feladatok közt szabadon lehet lépkedni (bal oldali/felső sáv számokkal).
 - „Teszt beadása” → megerősítés → eredmény: pontszám, %, és feladatonként a helyes válasz + a megoldás levezetése.
@@ -283,6 +283,150 @@ A kereslet–kínálat feladatnál egy **SVG ábra** mutassa a két egyenest és
 **Számtartományok és kerekítés:** PV 10 000 – 10 000 000 Ft (szép, kerek számok), r 1–20 % (egész vagy fél), n 1–30 év, évközi m ∈ {2, 4, 12}. Ft-ban **egészre kerekítve**, kamatláb **1 tizedesre**, tényleges kamatláb **2 tizedesre**, periódusszám **egészre**. A P3/P4 generátor úgy készüljön, hogy FV-t egész n-ből / szép r-ből számolja és Ft-ra kerekíti; az ellenőrzés a kerekített FV-ből visszaszámolt értékre is legyen toleráns (pl. 3,9994 → 4 év). A Ft-os válaszoknál ±1 Ft eltérés is elfogadható (kerekítési különbség), egy megjegyzéssel.
 
 **Ábra:** a témaoldalon (Elmélet) egy SVG mutassa a kamatos kamat (exponenciális) és az egyszerű kamat (lineáris) növekedését ugyanarra a betétre, 0–20 évre – így látszik, hogy a kamatos kamat lépcsői egyre nagyobbak.
+
+---
+
+### Közös szabályok a v4 témáihoz (5.5–5.7)
+
+- Mindhárom témánál érvényes a **3.2** (Miért így?, ellenpróba a hallgató saját számával, első tipp kérdés) és a **4.** fejezet (válaszellenőrzés).
+- Az órán a hallgatók **GeoGebrában** dolgoznak (5. és 6. téma). Az oldal **nem ágyazza be** a GeoGebrát (nincs külső kérés), de:
+  - minden ilyen feladatnál legyen egy lenyitható **„GeoGebrában így”** doboz, a konkrét beírandó sorokkal (tizedes**pont**tal!), pl. `p(x)=100*1.124^x`, `y=200`, `Metszéspont(p, f)` – a hallgató ezt kimásolhatja;
+  - a megoldás után egy **SVG ábra** mutassa a függvényt és a keresett pontot (metszéspont, szélsőérték), feliratozott tengelyekkel – a meglévő `js/lib/abra.js` bővítésével.
+- **Papíron is megoldható**: az 5. témánál a logaritmusos/gyökös levezetés is jelenjen meg a megoldásban (Ilona: „a dolgozatban szabadon választható”).
+- **Darabszám = egész szám** (6. téma): ha a kérdés darabszámra vonatkozik, a válasz a megfelelő **egész** határ; a nem egész metszéspontot a „Miért így?” magyarázza el a szomszédos egészek behelyettesítésével (pl. pr(23) < 0, pr(24) > 0).
+
+### 5.5 Téma 5 – Exponenciális függvények  *(v4)*
+
+**Kulcsképlet (kiemelve, piros keretben):**
+
+> **f(x) = a · qˣ** – a = kiinduló érték (x = 0-nál, mert q⁰ = 1), q = **éves szorzó** (növekedési tényező), x = eltelt évek száma.
+> Növekedés p %-kal évente: q = 1 + p/100 (12,4 % → 1,124). Csökkenés p %-kal: q = 1 − p/100 (1 % → 0,99; 0,3 % → 0,997).
+
+**Elmélet röviden:**
+- Már találkoztunk vele: a **kamatos kamat** is exponenciális függvény. Exponenciális = az **x a kitevőben** van, az alap egy konkrét szám (2ˣ, 0,6ˣ). Az x² vagy x³ **nem** exponenciális (az másod-, harmadfokú).
+- q > 1: **növekvő**; 0 < q < 1: **csökkenő**; q = 1: konstans (nem fordul elő). Csak pozitív alappal foglalkozunk.
+- Csökkenésnél a csökkenés **lassul** (egyre kisebb számnak vesszük ugyanannyi %-át): 20 · 0,95ˣ → 1; 0,95; 0,90 millió csökkenés.
+- **„Tegyen fel egy könnyebb kérdést”:** 1 év múlva · q, 2 év múlva · q², x év múlva · qˣ.
+- **A paraméterek értelmezése („faggassuk a függvényt”):** N(t) = 10,7 · 0,997ᵗ → 10,7 millió a kiinduló évben, évente **0,3 %-kal** (3 ezrelékkel) csökken.
+- **Kétszereződés / feleződés:** qˣ = 2 (vagy 0,5) → x = lg 2 / lg q. A kétszereződési idő **nem függ a kiinduló értéktől**: 100-ból 200 ugyanannyi idő, mint 200-ból 400.
+- **Az éves ütem két adatból:** a · qⁿ = b → **osztás** (nem kivonás!) → qⁿ = b/a → **n-edik gyök** → q → (q − 1) · 100 %.
+- **Lineáris vagy exponenciális?** „Minden évben ugyanannyi **forinttal**” → lineáris; „minden évben ugyanannyi **százalékkal** / azonos arányban” → exponenciális.
+
+**Kidolgozott példák (az eredeti diák):**
+1. Profit 20 millió Ft, évente −5 % → 19; 18,05; ≈ 17,15 millió; **p(x) = 20 · 0,95ˣ** (csökkenő).
+2. Élelmiszerár 1990-ben 100 Ft, évente +12,4 % → **p(x) = 100 · 1,124ˣ**; 2010-ben 100 · 1,124²⁰ ≈ **1036 Ft**; kétszereződés: x = lg 2 / lg 1,124 ≈ 5,93 ≈ **6 év** (400 Ft: ≈ 11,9 év, 800 Ft: ≈ 17,8 év).
+3. Népesség 25 millió (1980), évente −1 % → **P(x) = 25 · 0,99ˣ**; feleződés: 0,99ˣ = 0,5 → ≈ 68,97 ≈ **69 év**.
+4. Magyarország: N(t) = 10,7 · 0,997ᵗ → 1980-ban 10,7 millió; évente −0,3 %; 7,5 millió alá: t ≈ 118,3 → **2099-ben**.
+5. Üzemanyag: B(t) = 80 · 1,178ᵗ, G(t) = 75 · 1,186ᵗ (1993-tól) → 80 Ft, +17,8 %/év; 75 Ft, +18,6 %/év; utoléri: t = lg(80/75) / lg(1,186/1,178) ≈ 9,5 → **2003-ban**.
+6. Platina: 1988: 3,32, 1993: 3,87 millió t → q⁵ = 1,166 → q ≈ 1,031 → **+3,1 %/év**; f(x) = 3,32 · 1,031ˣ; 2030 (x = 42): ≈ **12,0 millió t**.
+7. Nyereség: 2000: 80, 2010: 75 millió Ft → q¹⁰ = 0,9375 → q ≈ 0,9936 → **≈ −0,64 %/év**; 2030 (x = 30): ≈ **65,9 millió Ft**.
+
+**Feladattípusok és tipikus hibák:**
+
+| Típus | Feladat | Helyes | Tipikus hibás válasz → visszajelzés |
+|---|---|---|---|
+| E1 szorzó | „évente p %-kal nő/csökken → mennyi q?” | 1 ± p/100 | p/100 (pl. 0,124) → „Ez csak a változás; a szorzó a megmaradó + a változás: 1,124.”; csökkenésnél 1 + p/100 → „Csökkenésnél kevesebb, mint 100 % marad.”; rossz nullák (0,3 % → 0,97 a 0,997 helyett) |
+| E2 függvényérték | a, p, x év → f(x) (2 tizedes vagy egész) | a · qˣ | **lineáris** a · (1 + x·p/100) → „Ez akkor lenne, ha minden évben ugyanannyival változna; itt ugyanannyi %-kal → hatvány.”; rossz kitevő (évszám-különbség ± 1) → „Hány év telt el? Az évszámok különbsége.” |
+| E3 növő/csökkenő, értelmezés | f(x) = a · qˣ → „növekvő vagy csökkenő?”, „mennyi a kiinduló érték?”, „hány %-kal változik évente?” (választós + szám) | q > 1 / q < 1; a; (q − 1) · 100 | 0,997 → „0,3 % csökkenés”, nem „99,7 %” → „A 99,7 % az, ami megmarad.” |
+| E4 kétszereződés / feleződés | p → hány év alatt duplázódik / feleződik (1 tizedes) | lg 2 / lg q, ill. lg 0,5 / lg q | 100 / p (lineáris becslés) → „Kamatos jellegű növekedés: logaritmus vagy GeoGebra-metszéspont.” |
+| E5 mikor éri el? | a, q, cél → x (1 tizedes, vagy „melyik évben”: egész évszám) | lg(cél/a) / lg q | évszámnál a kezdőév kimarad, vagy lefelé kerekít → „Ha 118,3 év kell, a 118. év végén még nincs alatta → a 119. évben.” |
+| E6 éves ütem két adatból | a, b, n év → p % (1 tizedes, előjeles a „változás”-nál) | (ⁿ√(b/a) − 1) · 100 | (b − a)/n (forintban egyenletes) → „Ez lineáris lenne; azonos arányban → n-edik gyök.”; (b/a − 1) · 100 (a teljes változás) → „Ez az egész időszak alatti változás, nem az éves.”; b − a-val kezd → „Szorzás ellentéte az osztás, nem a kivonás.” |
+| E7 előrejelzés | két adat → q, majd érték egy későbbi évre | a · q^(x) | a kerekített q-val számolt érték is legyen elfogadott (±0,5 %), megjegyzéssel |
+| E8 két függvény metszéspontja | a₁ · q₁ˣ = a₂ · q₂ˣ → melyik évben éri utol? | lg(a₁/a₂) / lg(q₂/q₁) | — (tipp: GeoGebrában mindkét függvény + Metszéspont) |
+| E9 exponenciális-e? (választós) | 4 képlet közül melyik exponenciális / melyik csökkenő | x a kitevőben | x² kiválasztása → „Itt az x az alap, nem a kitevő – ez másodfokú.” |
+
+**Számtartományok:** a 1–1000 (kerek), p 0,1–25 % (1 tizedes), x 1–60 év. Pénz és népesség: 2 tizedes vagy egész; %: 1 tizedes (a 4. fejezet tűrésével); évek: 1 tizedes, ill. „melyik évben” kérdésnél egész évszám.
+
+**„GeoGebrában így” (minta):** `p(x)=100*1.124^x` · tengelyarány (jobb klikk a rajzlapon → xTengely : yTengely) **1:100** · `y=200` · `Metszéspont(p, f)` (vagy kattintás a két alakzatra) · n-edik gyök: virtuális billentyűzet → f(x) fül. Tanács: az **origóra** téve a kurzort görgessen, így nem csúszik el a koordináta-rendszer.
+
+### 5.6 Téma 6 – Közgazdasági függvények vizsgálata  *(v4)*
+
+Az órán **kizárólag GeoGebrával** oldják meg (harmadfokú profitfüggvény, átlagköltség-függvény). A gyakorlóban a hallgató GeoGebrában (vagy az oldal ábráján leolvasva) dolgozik, és **számokat** ír be.
+
+**Kulcsgondolatok (kiemelve):**
+
+> **Maximum / minimum** → `Maximum(f, kezdő x, záró x)` / `Minimum(…)` – az intervallumot úgy adja meg, hogy a szélsőérték biztosan beleessen.
+> **Nyereséges** = a profit pozitív = a grafikon az **x-tengely fölött**. **Több mint K** = a grafikon az **y = K** egyenes fölött.
+> **Darabszám egész szám** → a nem egész metszéspont utáni / előtti első egész a határ.
+
+**Elmélet röviden:**
+- Mindig olvassa végig a feladatot: mi az x (pl. naponta eladott autók), mi a függvényérték (profit €-ban).
+- A függvény beírása: beszédes név (`pr(x)=…`), kitevő után a **jobbra nyíllal** vissza; **mindig ellenőrizze az algebra-ablakban**, mit írt be.
+- **Tengelyarány:** profitnál 1:1000, átlagköltségnél 1:20 – utána görgessen kifelé, amíg látszik a függvény.
+- **Rossz intervallum = rossz válasz:** 0–41 között a 41 „a legmagasabb pont” – a gép jól válaszolt, csak rosszul kérdeztünk.
+- **Nő / csökken:** balról jobbra haladva a minimumig csökken, a maximumig nő, utána megint csökken.
+- **Átlagköltség** = egy termékre jutó költség (100 db, 100 000 € → 1000 €/db). ac(x) = x + 750 + 2500/x; a „per x” osztásjel: `2500/x`.
+- **Változás %-ban:** a viszonyítási alap (100 %) a **korábbi** érték, az kerül a nevezőbe (mint a ház alapja – 1. téma).
+
+**Kidolgozott példák:**
+1. Autó: pr(x) = −x³ + 90x² − 1500x − 1000 (x: napi eladott autó, profit €) → a) max **50 db, 24 000 €**; b) minimum 10 db (−8000 €), **nő, ha 10 < x < 50**, egyébként csökken; c) x-tengelymetszetek ≈ 23,05 és 67,6 → nyereséges **24–67 db** között (pr(23) < 0, pr(24) ≈ 1016 €, pr(67) ≈ 1747 €, pr(68) < 0); d) y = 20 000 metszéspontjai ≈ 41,2 és 57,7 → **42–57 db**.
+2. Kerékpár (PPT 7–11. dia): pr(x) = −x³ + 135x² − 4200x − 5000 → max **70 db, 19 500 €**; nő, ha **20 < x < 70**; nyereséges **52–84 db**; > 10 000 €: **58–80 db** (a dián: „57 db-nál több, de 81 db-nál kevesebb”).
+3. Átlagköltség: ac(x) = x + 750 + 2500/x → a) 50 db alatt csökken, felette nő; b) min **50 db, 850 €/db**; c) < 900 €/db: metszéspontok ≈ 19,1 és 130,9 → **20–130 db**; d) 60 → 90 db: 851,7 → 867,8 €/db, **+16,1 €/db, +1,9 %**.
+
+**Feladattípusok és tipikus hibák:**
+
+| Típus | Feladat | Helyes | Tipikus hibás válasz → visszajelzés |
+|---|---|---|---|
+| G1 maximális profit | pr(x) harmadfokú → hány db, mennyi a profit (két mező) | a lokális maximum | egy intervallum szélén lévő érték → „Az intervallum széle nem csúcs; adjon meg szélesebb intervallumot.” |
+| G2 nő / csökken | mettől meddig nő (két mező: alsó, felső) | lokális min. és max. helye | a két érték felcserélése; a metszéspontok megadása → „Ezek a nyereségesség határai, nem a csúcsok.” |
+| G3 nyereséges | hány db-tól hány db-ig (egész, két mező) | ⌈x₁⌉ … ⌊x₂⌋ | a kerekített (nem felfelé) alsó határ (pl. 23) → „Ellenpróba: pr(23) = … < 0, ott még veszteséges.” |
+| G4 több mint K | y = K metszéspontjai → egész határok | mint G3 | mint G3 |
+| G5 függvényérték | pr(x) vagy ac(x) adott x-re | behelyettesítés | előjelhiba a −x³ tagnál → „A −x³ azt jelenti: −(x³).” |
+| G6 minimális átlagköltség | ac(x) = x + b + c/x → hány db, mennyi (két mező) | x = √c, ac(√c) = 2√c + b | — |
+| G7 átlagköltség < K | egész határok | mint G3 | mint G3 |
+| G8 változás két darabszám között | € és % (két mező, 1 tizedes) | (ac(x₂) − ac(x₁)) és ÷ ac(x₁) | a későbbi értékkel oszt → „Mihez viszonyítunk? A korábbi (x₁ darabos) érték a 100 %.” |
+
+**Generátor:** a profitfüggvényt a csúcsok helyéből építse fel, hogy a szélsőértékek egészek legyenek: pr'(x) = −3(x − m₁)(x − m₂) → pr(x) = −x³ + 1,5(m₁ + m₂)x² − 3m₁m₂x + c, ahol m₁ < m₂ egész, m₁ + m₂ páros (pl. 10 és 50 → 90x² − 1500x), c negatív (fix költség), és úgy választva, hogy a minimumban veszteség, a maximumban szép kerek nyereség legyen, és két pozitív x-tengelymetszet legyen. Átlagköltségnél c = k² (négyzetszám) → a minimum egész helyen van. A G3/G4/G7 határokat a teszt **egész értékek behelyettesítésével** ellenőrizze.
+
+**Ábra:** a megoldás után SVG: a függvény a releváns tartományon (x ≥ 0), a szélsőérték(ek) és a metszéspontok kiemelve, a vízszintes y = K egyenes szaggatottal; a „nyereséges” sáv színezve.
+
+**„GeoGebrában így” (minta):** `pr(x)=-x^3+90x^2-1500x-1000` · tengelyarány **1:1000** · `Maximum(pr, 0, 100)` · `Minimum(pr, 0, 20)` · `Metszéspont(pr, xTengely)` · `y=20000` · `pr(24)`.
+
+A **kereslet–kínálat** feladat (PPT 16–20. dia) a dolgozatban nem szerepel – ebbe a témába **ne** kerüljön gyakorló típusként.
+
+### 5.7 Téma 7 – Klasszikus valószínűség, valószínűségi változó  *(v4)*
+
+**Kulcsképletek (kiemelve):**
+
+> **P(A) = kedvező / összes** (ha minden elemi esemény egyformán valószínű); mindig **0 ≤ P(A) ≤ 1**.
+> **Független** események együtt: **P(A és B) = P(A) · P(B)**. **Egymást kizáró** események: **P(A vagy B) = P(A) + P(B)**. **Komplementer:** P(Ā) = 1 − P(A).
+> **Várható érték:** **M(X) = x₁ · p₁ + x₂ · p₂ + … + xₙ · pₙ** – egy játékra jutó átlagos nyeremény. > 0: kedvező, < 0: kedvezőtlen, = 0: igazságos.
+
+**Elmélet röviden:**
+- A valószínűség azt jelenti: nagyon sok, azonos körülmények közti kísérletben a **relatív gyakoriság** (bekövetkezések / kísérletek) e körül ingadozik.
+- **Elemi esemény** két érménél egy dobás**pár** (ff, fi, if, ii) – mind 1/4.
+- **Komplementer = „minden más”**: „mindkettő fej” ellentéte **„van köztük írás”**, nem „mindkettő írás”.
+- **Visszatevéses húzás** = két külön, egyforma pakli → a húzások **függetlenek**, szorzunk.
+- Ha a lehetséges esetek közül kettőnek megvan a valószínűsége, a harmadik a **maradék** (az összeg 1).
+- **Módusz** = a legvalószínűbb érték. A **szórás** a várható érték körüli ingadozást méri (egyszer megmutatjuk, nem gyakoroltatjuk).
+- **Magyar kártya:** 4 szín (piros, tök, zöld, makk) × 8 figura (VII, VIII, IX, X, alsó, felső, király, ász) = 32 lap.
+
+**Kidolgozott példák:**
+1. Két kocka, mindkettő kettes: 1/36 = 1/6 · 1/6.
+2. 5 lap (2 nyerő: +10 €, 3 vesztő: −4 €), két húzás visszatevéssel → X: 20 / 6 / −8 € → P: **0,16 / 0,48 / 0,36**; módusz 6 €; M(X) = **3,2 €** (100 játékra kivetítve: 16 · 20 + 48 · 6 − 36 · 8 = 320 € → 3,2 €/játék); D(X) ≈ 9,7.
+3. Magyar kártya, két kupac (20 lap: 2 piros; 12 lap: 6 piros), mindkettőből egy lap → 2 piros: 2/20 · 6/12 = **0,05**; 0 piros: 18/20 · 6/12 = **0,45**; 1 piros: **0,5**; fogadás +100 / −10 / −20 → M(X) = **−9** → nem kedvező.
+4. Frédi legfeljebb kétszer húz visszatevéssel 10 lapból (3 nyerő): elsőre nyer +40 (0,3), csak másodikra +10 (0,7 · 0,3 = 0,21), egyik sem −50 (0,49) → M(X) = **−10,4** → Frédinek nem kedvező, Béni átlagosan 10,4-et nyer.
+5. Moodle-gyakorlók: 40 / 20 / −60 €, P = 0,52 / 0,23 / ? → 0,25, M = **10,4**; 8 lap (2 db +12 €, 6 db −8 €), két húzás → 24 / 4 / −16 € → 0,0625 / 0,375 / 0,5625 → M = **−6**; 5 lap, 1 nyerő, legfeljebb két húzás: 20 / 15 / −25 € → 0,2 / 0,16 / 0,64 → M = **−9,6**.
+
+**Feladattípusok és tipikus hibák:**
+
+| Típus | Feladat | Helyes | Tipikus hibás válasz → visszajelzés |
+|---|---|---|---|
+| V1 klasszikus valószínűség | kocka/érme/kártya: „mennyi az esélye…” (tizedes tört, 4 tizedes) | kedvező/összes | a nem kedvezőkhöz viszonyít (2/18 a 2/20 helyett) → „Kedvező per **összes**.”; > 1 → „A valószínűség legfeljebb 1.” |
+| V2 komplementer | P(A) adott vagy számolható → P(Ā) | 1 − P(A) | a „fordított” esemény valószínűsége (két fej → két írás: 0,25) → „A komplementer minden más: van köztük írás.” |
+| V3 független együtt | két kocka / két kupac / két húzás → P(mindkettő) | p₁ · p₂ | összeadás → „Együtt bekövetkezés, függetlenek → szorzunk.” |
+| V4 nyeremény-eloszlás (két húzás visszatevéssel) | k nyerő + l vesztő lap, két húzás → a 3 lehetséges nyeremény és valószínűségük (táblázat: 3 + 3 mező) | P(NN) = p², P(VV) = (1−p)², P(vegyes) = 2p(1−p) | a vegyes esetnél csak p(1−p) → „Két sorrend lehetséges: nyerő-vesztő **vagy** vesztő-nyerő.” |
+| V5 „legfeljebb kétszer húz” | elsőre / csak másodikra / egyik sem → valószínűségek | p; (1−p)·p; (1−p)² | a „csak másodikra” esetnél p → „Másodszor csak akkor húz, ha elsőre vesztett: (1−p) · p.” |
+| V6 hiányzó valószínűség | két valószínűség adott → a harmadik | 1 − p₁ − p₂ | — |
+| V7 várható érték | értékek és valószínűségek → M(X) (2 tizedes, előjeles) | Σ xᵢ · pᵢ | a veszteség pozitív előjellel → „A veszteség negatív nyeremény.”; az értékek átlaga (valószínűségek nélkül) → „Súlyozni kell a valószínűségekkel.” |
+| V8 kedvező-e? (választós) | M(X) alapján kinek kedvez / igazságos-e | előjel | — |
+| V9 módusz | eloszlásból a legvalószínűbb érték | max pᵢ-hez tartozó xᵢ | a legnagyobb nyeremény → „A módusz a **legvalószínűbb**, nem a legnagyobb érték.” |
+
+**Számtartományok:** lapok száma 4–20, nyerő lapok 1–(n−1); nyeremények 1–100 (egész, a veszteség negatív); valószínűség **4 tizedesre** (pl. 0,0625), elfogadott tört alak is (`1/16`); várható érték **2 tizedesre**. Az ellenőrző a tört alakot (`3/5`) is fogadja el a valószínűségeknél.
+
+**Ábra:** az eloszlás oszlopdiagramja SVG-n (x: nyeremény, magasság: valószínűség), a várható érték függőleges szaggatott vonallal.
+
+**„Kivetítés 100 játékra”** mint magyarázó elem: a V7 „Miért így?” szövege a 100-zal szemléltetést így használja („100 játékból kb. 16-szor nyerünk 20-at…”).
 
 ## 6. Megjelenés
 
