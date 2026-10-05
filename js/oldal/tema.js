@@ -1,7 +1,7 @@
 // Témaoldal: Elmélet röviden – Kidolgozott példák – Gyakorlás (fülekkel).
 import { el, szovegbol } from './kozos.js';
 import { aiPanel } from './ai-panel.js';
-import { mezokRajzol, abraElem, miertElem } from './feladat-nezet.js';
+import { mezokRajzol, abraElem, miertElem, geogebraElem } from './feladat-nezet.js';
 import { temaKeres, TEMAK } from '../temak/index.js';
 import { ellenoriz, helyesE, helyesValaszSzoveg } from '../lib/ellenorzo.js';
 import { ujRng, valaszt } from '../lib/rng.js';
@@ -228,6 +228,7 @@ function feladatRajzol() {
     el('p', { class: 'feladat-szoveg', html: f.szoveg }),
     f.utasitas ? el('p', { class: 'utasitas', text: f.utasitas }) : null,
     abraElem(f.abra),
+    geogebraElem(f),
     urlap, osszesito, tippLista, megoldas, miert, aiPanel(aiKontextus)));
   gy.miert = miert;
 }

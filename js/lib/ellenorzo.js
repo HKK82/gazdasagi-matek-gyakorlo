@@ -22,13 +22,15 @@ export function egyezik(v, cel, tizedes) {
  */
 export function szamMezo({
   id = 'v', cimke, helyes, tizedes = 2, elojel = 'sima', egyseg = '', hibak = [],
-  alternativ = [], elojelUzenet = '', negativ = false, abszTures = 0, ellenproba = null,
+  alternativ = [], elojelUzenet = '', negativ = false, abszTures = 0, relTures = 0, ellenproba = null,
 }) {
   const tiszta = [];
   // egy tipikus hiba csak akkor marad, ha a kért pontosság mellett nem fogadnánk el helyesnek
   const kozel = (a, b) => egyezik(a, b, tizedes) || egyezik(b, a, tizedes);
   // abszTures: kerekítési eltérés (pl. ±1 Ft), amit megjegyzéssel elfogadunk – a hibák ettől is távol legyenek
-  const abszKozel = (a, b) => abszTures > 0 && Math.abs(a - b) <= abszTures + tures(tizedes) + 1e-9;
+  const abszKozel = (a, b) => (abszTures > 0 && Math.abs(a - b) <= abszTures + tures(tizedes) + 1e-9)
+    // relTures: a kerekített köztes értékkel számolt eredmény (pl. ±0,5 %) is elfogadott
+    || (relTures > 0 && Math.abs(a - b) <= relTures * Math.abs(b) + tures(tizedes) + 1e-9);
   for (const h of hibak) {
     if (!Number.isFinite(h.ertek)) continue;
     if (kozel(h.ertek, helyes) || abszKozel(h.ertek, helyes)) continue;
@@ -39,7 +41,7 @@ export function szamMezo({
   }
   return {
     tipus: 'szam', id, cimke, helyes, tizedes, elojel, egyseg, hibak: tiszta,
-    alternativ, elojelUzenet, abszTures,
+    alternativ, elojelUzenet, abszTures, relTures,
     // ellenproba(v): a hallgató saját számával mutatja meg szövegesen, miért nem stimmel (lásd SPEC 3.2)
     ellenproba: typeof ellenproba === 'function' ? ellenproba : null,
     negativ: negativ || helyes < 0 || elojel !== 'sima',
@@ -114,9 +116,16 @@ export function ellenoriz(mezo, bevitel) {
       uzenet: `Elfogadva. A kerekítés miatt ±${formaz(mezo.abszTures, 0)}${mezo.egyseg ? ' ' + mezo.egyseg : ''} eltérés előfordulhat; a pontos érték ${formaz(mezo.helyes, d)}${mezo.egyseg ? ' ' + mezo.egyseg : ''}.`,
     };
   }
+  if (mezo.relTures > 0 && Math.abs(v - mezo.helyes) <= mezo.relTures * Math.abs(mezo.helyes) + 1e-9) {
+    return {
+      allapot: 'jo-megjegyzes', ertek: v,
+      uzenet: `Elfogadva. Ez a kerekített köztes értékkel számolt eredmény (±${formaz(mezo.relTures * 100, 1)} % eltérés megengedett); a pontos érték ${formaz(mezo.helyes, d)}${mezo.egyseg ? ' ' + mezo.egyseg : ''}.`,
+    };
+  }
   const ellenproba = ellenprobaSzoveg(mezo, v);
   for (const h of mezo.hibak || []) {
-    if (egyezik(v, h.ertek, d)) return { allapot: 'tipikus', uzenet: h.uzenet, ertek: v, ellenproba };
+    // h.tures: a hibához tartozó saját tűrés (pl. százalék alakban kerekítve beírt érték)
+    if (egyezik(v, h.ertek, d) || (h.tures > 0 && Math.abs(v - h.ertek) <= h.tures)) return { allapot: 'tipikus', uzenet: h.uzenet, ertek: v, ellenproba };
   }
   return { allapot: 'rossz', uzenet: UZENET.rossz, ertek: v, ellenproba };
 }

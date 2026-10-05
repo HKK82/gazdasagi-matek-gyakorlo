@@ -378,3 +378,24 @@ dialog::backdrop { background: rgba(0, 0, 0, .45); }
 code { background: var(--felulet-2); padding: .05rem .3rem; border-radius: 4px; }
 @media (max-width: 30rem) { .ai-bevitel { flex-direction: column; } }
 #kulcsMezo { max-width: 30rem !important; }
+
+.abra-sav { fill: var(--v1); opacity: .13; }
+details.geogebra { border: 2px solid var(--keret); border-radius: 10px; background: var(--felulet-2); margin: .75rem 0; padding: .1rem .9rem; }
+details.geogebra > summary { cursor: pointer; font-weight: 700; padding: .55rem 0; }
+.gg-sor { display: flex; gap: .5rem; align-items: center; margin: .3rem 0; }
+.gg-sor code { flex: 1; padding: .3rem .5rem; overflow-x: auto; white-space: nowrap; }
+.gg-sor .gomb { min-height: 2rem; padding: .15rem .6rem; font-size: .85rem; }
+
+/* ---- Témák lenyíló menü a fejlécben ---- */
+.nav-temak { position: relative; }
+.nav-temak summary { cursor: pointer; font-weight: 600; color: var(--kiemel); list-style: none; }
+.nav-temak summary::-webkit-details-marker { display: none; }
+.nav-temak summary::after { content: ' ▾'; }
+.nav-temak details[open] > summary::after { content: ' ▴'; }
+.nav-temak details > ul {
+  position: absolute; z-index: 20; top: 2rem; left: 0; min-width: 16rem; flex-direction: column; align-items: flex-start; gap: .1rem;
+  background: var(--felulet); border: 1px solid var(--keret); border-radius: 10px; padding: .5rem .75rem; box-shadow: var(--arnyek);
+}
+.nav-temak details > ul li { width: 100%; }
+.nav-temak details > ul a { display: block; padding: .3rem 0; }
+@media (max-width: 30rem) { .nav-temak details > ul { position: static; box-shadow: none; margin-top: .3rem; } }

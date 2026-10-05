@@ -1,6 +1,6 @@
 // Próbateszt: 10 feladat, 20 perc az egész tesztre, szabad lépkedés, beadás, eredmény + levezetés.
 import { el } from './kozos.js';
-import { mezokRajzol, abraElem, miertElem } from './feladat-nezet.js';
+import { mezokRajzol, abraElem, miertElem, geogebraElem } from './feladat-nezet.js';
 import { TEMAK } from '../temak/index.js';
 import { ujRng } from '../lib/rng.js';
 import { tesztFeladatok, TESZT_DB, TESZT_PERC } from '../lib/teszt-osszeallito.js';
@@ -98,6 +98,7 @@ function feladatMutat(i, fokusz = true) {
       el('span', { class: 'figyelmeztetes', text: temaCim })),
     el('p', { class: 'feladat-szoveg', html: feladat.szoveg }),
     abraElem(feladat.abra),
+    geogebraElem(feladat),
     urlap));
   savRajzol();
   if (fokusz) input.focus();

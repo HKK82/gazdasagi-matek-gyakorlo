@@ -52,6 +52,28 @@ export function az(x, d = 2, nagy = false) {
 }
 export const Az = (x, d = 2) => az(x, d, true);
 
+/**
+ * Évszám + „-ban/-ben” (az évszám kiejtése szerint): 1993-ban, 2010-ben, 2020-ban.
+ * A toldalék az évszám utolsó két számjegyétől függ (három → -ban, négy → -ben, húsz → -ban, ötven → -ben …).
+ */
+export function evben(ev) {
+  const e = Math.abs(Math.round(ev));
+  const egyes = e % 10, tizes = Math.floor((e % 100) / 10);
+  const mely = { 1: 'ben', 2: 'ben', 3: 'ban', 4: 'ben', 5: 'ben', 6: 'ban', 7: 'ben', 8: 'ban', 9: 'ben' };
+  const tizesek = { 1: 'ben', 2: 'ban', 3: 'ban', 4: 'ben', 5: 'ben', 6: 'ban', 7: 'ben', 8: 'ban', 9: 'ben' };
+  let t;
+  if (e % 100 === 0) t = e % 1000 === 0 ? 'ben' : 'ban'; // kétezerben, de ezerkilencszázban
+  else if (egyes === 0) t = tizesek[tizes];
+  else t = mely[egyes];
+  return `${e}-${t}`;
+}
+
+/** Szám GeoGebra-beíráshoz: tizedespont, ezres elválasztó nélkül (pl. 1.124). */
+export const gg = (x, d = 6) => String(Number(Number(x).toFixed(d)));
+
+/** Kisbetűs kezdés (mondat közbeni felhasználáshoz). */
+export const kisbetus = (sz) => sz.charAt(0).toLowerCase() + sz.slice(1);
+
 /** Felső index számjegyekkel: 1,08³ (sima szövegben és HTML-ben is működik). */
 export const sup = (n) => String(n).replace(/\d/g, (d) => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d]);
 
