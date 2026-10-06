@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { ujRng } from '../js/lib/rng.js';
 import { formaz } from '../js/lib/szam.js';
 import { ellenoriz, valasztoMezo } from '../js/lib/ellenorzo.js';
-import { TEMAK } from '../js/temak/index.js';
+import { TEMAK, FELVETELI_TEMAK } from '../js/temak/index.js';
 import { sima, szamok } from './segito.js';
 import { evben } from '../js/temak/seged.js';
 
@@ -32,7 +32,7 @@ const rosszRagozas = (szoveg) => {
   return t.match(EGYSEG_RAGOZAS)?.[0] || null;
 };
 
-for (const tema of TEMAK) {
+for (const tema of [...TEMAK, ...FELVETELI_TEMAK]) {
   for (const tipus of tema.tipusok) {
     test(`${tema.id} / ${tipus.id} – ${tipus.nev}: magyarázat, ellenpróba, rávezető tipp`, () => {
       const rng = ujRng(31000 + tipus.id.charCodeAt(0) * 100 + Number(tipus.id.slice(1)));

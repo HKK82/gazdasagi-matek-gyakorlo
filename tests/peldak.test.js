@@ -1,9 +1,9 @@
 // A SPEC 5. fejezetének kidolgozott példái: a végeredményeknek pontosan ki kell jönniük.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TEMAK } from '../js/temak/index.js';
+import { TEMAK, FELVETELI_TEMAK } from '../js/temak/index.js';
 
-for (const tema of TEMAK) {
+for (const tema of [...TEMAK, ...FELVETELI_TEMAK]) {
   test(`${tema.cim}: a kidolgozott példák végeredményei egyeznek a SPEC-kel`, () => {
     const lista = tema.peldaEllenorzes();
     assert.ok(lista.length >= 8);
