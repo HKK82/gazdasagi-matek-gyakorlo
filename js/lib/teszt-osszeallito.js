@@ -39,3 +39,6 @@ export function tesztFeladatok(rng, temak, n = 10) {
 
 export const TESZT_PERC = 20;
 export const TESZT_DB = 10;
+// A próba felvételi: a valódi írásbeli is 45 perces.
+export const FELV_TESZT_PERC = 45;
+export const FELV_TESZT_DB = 12;

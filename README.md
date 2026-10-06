@@ -28,10 +28,12 @@ A Gyakorlás fülön minden feladat alatt megnyitható egy AI-panel (Google Gemi
 index.html            kezdőoldal (témakártyák, haladás, próbateszt)
 tema.html?t=<id>      témaoldal: Elmélet röviden / Kidolgozott példák / Gyakorlás
 teszt.html            próbateszt
+felveteli.html        felvételi gyakorló (8. évfolyam): hat témakör, próba felvételi (felveteli-teszt.html, 45 perc)
 ai.html               AI-asszisztens: útmutató az API-kulcshoz és beállítás
 css/style.css         megjelenés (világos/sötét téma, „Nagy betű” mód)
 js/lib/               számkezelés, válaszellenőrző, SVG-ábra, haladás, tesztösszeállító, Gemini-kliens, kulcstárolás
 js/temak/             témák (egy téma = egy modul: szazalek, linearis, kozgazdasag, penzugy, exponencialis, fuggvenyvizsgalat, valoszinuseg) + index.js
+js/felveteli/         a felvételi-gyakorló témái (ugyanaz a modulszerkezet, id: fv-…) + index.js
 js/oldal/             az egyes oldalak kezelőkódja
 tests/                node --test egységtesztek
 ```

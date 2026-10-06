@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Próbateszt – Gazdasági matematika gyakorló</title>
-  <meta name="description" content="Moodle-szerű próbateszt: 10 feladat, 20 perc.">
+  <title>Próba felvételi – 8. évfolyam matematika</title>
+  <meta name="description" content="Próba felvételi: 12 feladat, 45 perc, véletlen számokkal.">
   <meta name="color-scheme" content="light dark">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' rx='6' fill='white' stroke='%23c0262d' stroke-width='3'/%3E%3Ctext x='16' y='22' font-size='15' font-family='Arial' font-weight='bold' text-anchor='middle' fill='%23c0262d'%3E%25%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="css/style.css">
   <script>try { if (localStorage.getItem('gmgy-nagybetu') === '1') document.documentElement.classList.add('nagy-betu'); } catch (e) {}</script>
 </head>
-<body>
+<body data-sor="felveteli">
   <a class="ugro-link" href="#tartalom">Ugrás a tartalomra</a>
   <header class="fejlec">
     <div class="fejlec-belso">
@@ -27,8 +27,8 @@
             <li><a href="tema.html?t=fuggvenyvizsgalat">Függvényvizsgálat</a></li>
             <li><a href="tema.html?t=valoszinuseg">Valószínűség</a></li>
           </ul></details></li>
-          <li><a href="teszt.html" aria-current="page">Próbateszt</a></li>
-          <li><a href="felveteli.html">Felvételi (8. évf.)</a></li>
+          <li><a href="teszt.html">Próbateszt</a></li>
+          <li><a href="felveteli.html" aria-current="page">Felvételi (8. évf.)</a></li>
           <li><a href="ai.html">AI-asszisztens</a></li>
           <li><button type="button" class="gomb halk kapcsolo" id="nagyBetu" aria-pressed="false">Nagy betű</button></li>
         </ul>
@@ -36,21 +36,21 @@
     </div>
   </header>
   <main id="tartalom" tabindex="-1">
-    <h1>Próbateszt</h1>
-    <noscript><p class="doboz">Az oldal működéséhez engedélyezze a JavaScriptet a böngészőben.</p></noscript>
+    <h1>Próba felvételi</h1>
+    <noscript><p class="doboz">Az oldal működéséhez engedélyezni kell a JavaScriptet a böngészőben.</p></noscript>
     <div id="tesztTartalom"></div>
     <div class="sr-only" aria-live="assertive" id="idoBejelentes"></div>
     <dialog id="beadasDialog" aria-labelledby="beadasCim">
-      <h2 id="beadasCim">Beadja a tesztet?</h2>
+      <h2 id="beadasCim">Beadod a feladatsort?</h2>
       <p id="beadasSzoveg"></p>
       <div class="gombsor">
         <button type="button" class="gomb halk" id="beadasMegse">Mégse, folytatom</button>
-        <button type="button" class="gomb elsodleges" id="beadasIgen">Teszt beadása</button>
+        <button type="button" class="gomb elsodleges" id="beadasIgen">Beadás</button>
       </div>
     </dialog>
   </main>
   <footer class="labjegyzet">
-    <p>Gyakorlóoldal a Gazdasági matematika tárgyhoz. Nincs belépés és nincs adatgyűjtés: a haladás csak ebben a böngészőben tárolódik. Az AI-asszisztens opcionális: csak saját API-kulccsal, az Ön kérdésére küld adatot a Google Gemini felé.</p>
+    <p>Felvételi-gyakorló a 8. évfolyamosoknak. Nincs belépés és nincs adatgyűjtés: az eredmény csak ebben a böngészőben tárolódik.</p>
   </footer>
   <script type="module" src="js/oldal/teszt.js"></script>
 </body>

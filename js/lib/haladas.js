@@ -86,20 +86,30 @@ export function temaSzazalek(tema) {
   return Math.round((ossz / tipusok.length) * 100);
 }
 
-export function legjobbTeszt() {
-  return betolt().teszt.legjobb;
+/** A legjobb teszteredmény. A kulcs: 'teszt' (gazdasági próbateszt) vagy 'felvTeszt' (próba felvételi). */
+export function legjobbTeszt(kulcs = 'teszt') {
+  return betolt()[kulcs]?.legjobb ?? null;
 }
 
 /** Teszteredmény mentése; igazat ad, ha új legjobb. */
-export function tesztMentes(pont, ossz) {
+export function tesztMentes(pont, ossz, kulcs = 'teszt') {
   const a = betolt();
-  a.teszt.kitoltve = (a.teszt.kitoltve || 0) + 1;
+  const t = (a[kulcs] ??= { legjobb: null, kitoltve: 0 });
+  t.kitoltve = (t.kitoltve || 0) + 1;
   const szazalek = Math.round((pont / ossz) * 100);
-  const regi = a.teszt.legjobb;
+  const regi = t.legjobb;
   const uj = !regi || szazalek > regi.szazalek;
-  if (uj) a.teszt.legjobb = { pont, ossz, szazalek, datum: new Date().toISOString().slice(0, 10) };
+  if (uj) t.legjobb = { pont, ossz, szazalek, datum: new Date().toISOString().slice(0, 10) };
   ment();
   return uj;
+}
+
+/** Csak a megadott témák haladásának és a próba felvételi eredményének törlése (a többi marad). */
+export function torolFelveteli(temaIdk) {
+  const a = betolt();
+  for (const id of temaIdk) delete a.temak[id];
+  delete a.felvTeszt;
+  ment();
 }
 
 export function torol() {

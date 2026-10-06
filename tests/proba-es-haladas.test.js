@@ -92,3 +92,22 @@ test('haladás: tároló nélkül és hibás tárolóval is működik', () => {
   haladas.beallitTarolo(rossz);
   assert.equal(haladas.tipusAllapot('linearis', 'L1').jo, 0);
 });
+
+test('haladás: a próba felvételi eredménye külön mentődik, és a felvételi törlés a gazdasági haladást nem érinti', () => {
+  haladas.beallitTarolo(memoriaTarolo());
+  haladas.rogzit('szazalek', 'T1', true);
+  haladas.rogzit('fv-szamok', 'S1', true);
+  assert.equal(haladas.legjobbTeszt('felvTeszt'), null);
+  assert.equal(haladas.tesztMentes(5, 12, 'felvTeszt'), true);
+  assert.equal(haladas.tesztMentes(3, 12, 'felvTeszt'), false);
+  assert.equal(haladas.legjobbTeszt('felvTeszt').pont, 5);
+  assert.equal(haladas.legjobbTeszt(), null, 'a gazdasági próbateszt eredménye érintetlen');
+  haladas.tesztMentes(7, 10);
+  assert.equal(haladas.legjobbTeszt().pont, 7);
+  assert.equal(haladas.legjobbTeszt('felvTeszt').pont, 5);
+  haladas.torolFelveteli(['fv-szamok']);
+  assert.equal(haladas.tipusAllapot('fv-szamok', 'S1').jo, 0);
+  assert.equal(haladas.legjobbTeszt('felvTeszt'), null);
+  assert.equal(haladas.tipusAllapot('szazalek', 'T1').jo, 1, 'a gazdasági haladás megmarad');
+  assert.equal(haladas.legjobbTeszt().pont, 7);
+});

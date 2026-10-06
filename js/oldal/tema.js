@@ -12,10 +12,35 @@ const parameterek = new URLSearchParams(location.search);
 const tema = temaKeres(parameterek.get('t')) || TEMAK[0];
 const tartalom = document.getElementById('temaTartalom');
 
-document.title = `${tema.cim} – Gazdasági matematika gyakorló`;
+// A felvételi-gyakorló témái tegezve szólnak a diákhoz (a js/felveteli/ mappa moduljai, tema.sor === 'felveteli').
+const FV = tema.sor === 'felveteli';
+const SZ = FV ? {
+  peldaBevezeto: 'Próbáld meg először önállóan, majd nyisd ki a megoldást lépésenként a „Következő lépés” gombbal.',
+  jegyezd: 'Ezt jegyezd meg',
+  nemSzamit: 'Ez a feladat nem számít bele a „3 egymás után jó” sorozatba. Próbálj ki egy új feladatot!',
+  tipikus: 'Olvasd el a mező alatti magyarázatot, javítsd, és ellenőrizd újra!',
+  meg: 'Próbáld újra, vagy kérj tippet a „Tipp” gombbal!',
+  kitolt: 'ℹ Töltsd ki az összes mezőt egy-egy számmal, és ellenőrizd újra.',
+  reszben: 'ℹ Néhány válasz jó – a többit nézd meg még egyszer.',
+} : {
+  peldaBevezeto: 'Próbálja meg először önállóan, majd nyissa ki a megoldást lépésenként a „Következő lépés” gombbal.',
+  jegyezd: 'Ezt jegyezze meg',
+  nemSzamit: 'Ez a feladat nem számít bele a „3 egymás után jó” sorozatba. Próbáljon ki egy új feladatot!',
+  tipikus: 'Olvassa el a mező alatti magyarázatot, javítsa, és ellenőrizze újra!',
+  meg: 'Próbálja újra, vagy kérjen tippet a „Tipp” gombbal!',
+  kitolt: 'ℹ Töltse ki az összes mezőt egy-egy számmal, és ellenőrizze újra.',
+  reszben: 'ℹ Néhány válasz jó – a többit nézze meg még egyszer.',
+};
+
+document.title = `${tema.cim} – ${FV ? 'Felvételi gyakorló' : 'Gazdasági matematika gyakorló'}`;
 document.getElementById('temaCim').textContent = tema.cim;
 for (const a of document.querySelectorAll('.fejlec nav a')) {
-  if (a.getAttribute('href') === `tema.html?t=${tema.id}`) a.setAttribute('aria-current', 'page');
+  if (a.getAttribute('href') === `tema.html?t=${tema.id}` || (FV && a.getAttribute('href') === 'felveteli.html')) a.setAttribute('aria-current', 'page');
+}
+if (FV) {
+  const vissza = document.getElementById('vissza');
+  vissza.href = 'felveteli.html';
+  vissza.textContent = '← Vissza a felvételi témákhoz';
 }
 
 // ---------- Elmélet ----------
@@ -68,7 +93,7 @@ function peldaKartya(p, i) {
 function peldakPanel() {
   return [
     el('h2', { text: 'Kidolgozott példák' }),
-    el('p', { class: 'bevezeto', text: 'Próbálja meg először önállóan, majd nyissa ki a megoldást lépésenként a „Következő lépés” gombbal.' }),
+    el('p', { class: 'bevezeto', text: SZ.peldaBevezeto }),
     kulcskepletDoboz(true),
     ...tema.peldak.map(peldaKartya),
   ];
@@ -141,6 +166,7 @@ function aiKontextus() {
   const mutatva = gy.megoldasMutatva;
   return {
     temaCim: tema.cim,
+    sor: tema.sor,
     tipusNev: `${gy.tipus.id} – ${gy.tipus.nev}`,
     kulcskeplet: szovegbol(tema.kulcskeplet),
     feladat: szovegbol(`${f.szoveg} ${f.utasitas || ''}`),
@@ -219,8 +245,8 @@ function feladatRajzol() {
     el('h3', { tabindex: '-1', text: 'Megoldás lépésenként' }),
     el('ol', { class: 'lepesek' }, f.megoldas.map((l) => el('li', { html: l }))),
     abraElem(f.abraMegoldas),
-    el('p', { class: 'jegyezze', html: `Ezt jegyezze meg: ${f.jegyezze}` }),
-    gy.fix ? null : el('p', { class: 'figyelmeztetes', text: 'Ez a feladat nem számít bele a „3 egymás után jó” sorozatba. Próbáljon ki egy új feladatot!' }));
+    el('p', { class: 'jegyezze', html: `${SZ.jegyezd}: ${f.jegyezze}` }),
+    gy.fix ? null : el('p', { class: 'figyelmeztetes', text: SZ.nemSzamit }));
 
   gyakorlasHely.replaceChildren(el('article', { class: 'feladat', 'aria-labelledby': 'feladatCim' },
     el('div', { class: 'feladat-fej' },
@@ -265,7 +291,7 @@ function ellenorzes(osszesito) {
     if (gy.miert) { gy.miert.hidden = false; }
     osszesito.replaceChildren(...[
       el('p', {}, el('span', { class: 'ikon', text: '✔ ' }), el('strong', { text: valaszt(rng, ['Helyes!', 'Szép munka, ez jó!', 'Pontosan így van!']) })),
-      el('p', { class: 'jegyezze', html: `Ezt jegyezze meg: ${f.jegyezze}` }),
+      el('p', { class: 'jegyezze', html: `${SZ.jegyezd}: ${f.jegyezze}` }),
       sorozatUzenet ? el('p', { text: sorozatUzenet }) : null,
       gy.miert ? el('p', {}, el('button', { type: 'button', class: 'gomb halk', onclick: () => { gy.miert.hidden = false; gy.miert.open = true; gy.miert.querySelector('summary').focus(); } }, 'Miért így? – magyarázat szavakkal')) : null,
     ].filter(Boolean));
@@ -279,17 +305,17 @@ function ellenorzes(osszesito) {
   if (eredmenyek.some((e) => e.allapot === 'tipikus')) {
     osszesito.classList.add('tipikus');
     osszesito.replaceChildren(el('p', {}, el('span', { class: 'ikon', text: '⚠ ' }),
-      el('strong', { text: 'Tipikus hiba. ' }), el('span', { text: 'Olvassa el a mező alatti magyarázatot, javítsa, és ellenőrizze újra!' })));
+      el('strong', { text: 'Tipikus hiba. ' }), el('span', { text: SZ.tipikus })));
   } else if (hibas) {
     osszesito.classList.add('rossz');
     osszesito.replaceChildren(el('p', {}, el('span', { class: 'ikon', text: '✖ ' }),
-      el('strong', { text: 'Még nem jó. ' }), el('span', { text: 'Próbálja újra, vagy kérjen tippet a „Tipp” gombbal!' })));
+      el('strong', { text: 'Még nem jó. ' }), el('span', { text: SZ.meg })));
   } else if (hianyos) {
     osszesito.classList.add('info');
-    osszesito.replaceChildren(el('p', { text: 'ℹ Töltse ki az összes mezőt egy-egy számmal, és ellenőrizze újra.' }));
+    osszesito.replaceChildren(el('p', { text: SZ.kitolt }));
   } else {
     osszesito.classList.add('info');
-    osszesito.replaceChildren(el('p', { text: 'ℹ Néhány válasz jó – a többit nézze meg még egyszer.' }));
+    osszesito.replaceChildren(el('p', { text: SZ.reszben }));
   }
 }
 
