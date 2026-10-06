@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Téma – Felvételi gyakorló</title>
+  <meta name="description" content="Elmélet, kidolgozott példák és gyakorlófeladatok.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' rx='6' fill='white' stroke='%231d5ea8' stroke-width='3'/%3E%3Ctext x='16' y='22' font-size='16' font-family='Arial' font-weight='bold' text-anchor='middle' fill='%231d5ea8'%3E8%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+  <script>try { if (localStorage.getItem('gmgy-nagybetu') === '1') document.documentElement.classList.add('nagy-betu'); } catch (e) {}</script>
+</head>
+<body>
+  <a class="ugro-link" href="#tartalom">Ugrás a tartalomra</a>
+  <header class="fejlec">
+    <div class="fejlec-belso">
+      <a class="logo" href="index.html"><span class="logo-jel" aria-hidden="true">8</span> Felvételi gyakorló – matematika</a>
+      <nav aria-label="Fő navigáció">
+        <ul>
+          <li><a href="index.html">Kezdőlap</a></li>
+          <li class="nav-temak"><details><summary>Témakörök</summary><ul>
+            <li><a href="tema.html?t=fv-szamok">Számok, törtek, oszthatóság</a></li>
+            <li><a href="tema.html?t=fv-mertek">Mértékegységek átváltása</a></li>
+            <li><a href="tema.html?t=fv-szoveges">Szöveges feladatok, egyenletek</a></li>
+            <li><a href="tema.html?t=fv-geometria">Geometria</a></li>
+            <li><a href="tema.html?t=fv-kombinatorika">Kombinatorika, valószínűség</a></li>
+            <li><a href="tema.html?t=fv-aranyok">Százalék, arány, mozgás</a></li>
+          </ul></details></li>
+          <li><a href="teszt.html">Próba felvételi</a></li>
+          <li><a href="ai.html">AI-asszisztens</a></li>
+          <li><button type="button" class="gomb halk kapcsolo" id="nagyBetu" aria-pressed="false">Nagy betű</button></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <main id="tartalom" tabindex="-1">
+    <p><a href="index.html" id="vissza">← Vissza a témakörökhöz</a></p>
+    <h1 id="temaCim">Téma</h1>
+    <noscript><p class="doboz">Az oldal működéséhez engedélyezze a JavaScriptet a böngészőben.</p></noscript>
+    <div id="temaTartalom"></div>
+  </main>
+  <footer class="labjegyzet">
+    <p>Felvételi-gyakorló a 8. évfolyamosoknak. Nincs belépés és nincs adatgyűjtés: a haladás csak ebben a böngészőben tárolódik. Az AI-asszisztens opcionális: csak saját API-kulccsal, a kérdésre küld adatot a Google Gemini felé.</p>
+  </footer>
+  <script type="module" src="js/oldal/tema.js"></script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI-asszisztens – Felvételi gyakorló</title>
+  <meta name="description" content="Opcionális AI-asszisztens saját, ingyenes Gemini API-kulccsal: útmutató és beállítás.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="referrer" content="no-referrer">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' rx='6' fill='white' stroke='%231d5ea8' stroke-width='3'/%3E%3Ctext x='16' y='22' font-size='16' font-family='Arial' font-weight='bold' text-anchor='middle' fill='%231d5ea8'%3E8%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+  <script>try { if (localStorage.getItem('gmgy-nagybetu') === '1') document.documentElement.classList.add('nagy-betu'); } catch (e) {}</script>
+</head>
+<body>
+  <a class="ugro-link" href="#tartalom">Ugrás a tartalomra</a>
+  <header class="fejlec">
+    <div class="fejlec-belso">
+      <a class="logo" href="index.html"><span class="logo-jel" aria-hidden="true">8</span> Felvételi gyakorló – matematika</a>
+      <nav aria-label="Fő navigáció">
+        <ul>
+          <li><a href="index.html" aria-current="page">Kezdőlap</a></li>
+          <li class="nav-temak"><details><summary>Témakörök</summary><ul>
+            <li><a href="tema.html?t=fv-szamok">Számok, törtek, oszthatóság</a></li>
+            <li><a href="tema.html?t=fv-mertek">Mértékegységek átváltása</a></li>
+            <li><a href="tema.html?t=fv-szoveges">Szöveges feladatok, egyenletek</a></li>
+            <li><a href="tema.html?t=fv-geometria">Geometria</a></li>
+            <li><a href="tema.html?t=fv-kombinatorika">Kombinatorika, valószínűség</a></li>
+            <li><a href="tema.html?t=fv-aranyok">Százalék, arány, mozgás</a></li>
+          </ul></details></li>
+          <li><a href="teszt.html">Próba felvételi</a></li>
+          <li><a href="ai.html" aria-current="page">AI-asszisztens</a></li>
+          <li><button type="button" class="gomb halk kapcsolo" id="nagyBetu" aria-pressed="false">Nagy betű</button></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <main id="tartalom" tabindex="-1">
+    <h1>AI-asszisztens (opcionális)</h1>
+    <p class="bevezeto">A gyakorló feladatoknál egy AI-tanár is segíthet: elmagyarázza a feladatot a saját számaival, megmutatja, miért hibás a válasz, és rávezet a megoldásra. Ehhez <strong>saját, ingyenes Google Gemini API-kulcs</strong> kell. A gyakorló az AI nélkül is teljes értékűen használható.</p>
+
+    <section class="doboz" aria-labelledby="mitCim">
+      <h2 id="mitCim">Mit tud, és mit nem?</h2>
+      <ul>
+        <li>A <strong>Gyakorlás</strong> fülön minden feladat alatt megnyitható az „🤖 AI-asszisztens” panel: gyorsgombokkal („Magyarázd el másképp”, „Miért hibás a válaszom?”, „Adj egy tippet”) vagy saját kérdéssel.</li>
+        <li>Az AI a feladat szövegét, az Ön beírt válaszát és az oldal visszajelzését látja, ezért <em>az Ön számaival</em> magyaráz. A végeredményt csak akkor mondja meg, ha már megnézte a megoldást, vagy kifejezetten kéri.</li>
+        <li><strong>Tévedhet.</strong> A válasz helyességét mindig az oldal ellenőrzője dönti el, nem az AI.</li>
+        <li>A <strong>Próba felvételiben</strong> nincs AI – az vizsgagyakorlás.</li>
+        <li>Az AI csak akkor kap bármit, ha Ön kérdez. Automatikus kérés nincs.</li>
+      </ul>
+    </section>
+
+    <section class="doboz" aria-labelledby="utmCim">
+      <h2 id="utmCim">Hogyan kérjek ingyenes API-kulcsot? (kb. 3 perc)</h2>
+      <ol class="lepesek-lista">
+        <li><strong>Nyissa meg a Google AI Studiót:</strong> <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a> (új lapon nyílik meg).</li>
+        <li><strong>Jelentkezzen be Google-fiókkal.</strong> Érdemes a saját (magán) Gmail-fiókot használni: iskolai vagy munkahelyi fiókon az AI Studio gyakran le van tiltva.</li>
+        <li>Fogadja el a feltételeket, ha az oldal kéri.</li>
+        <li>Kattintson az <strong>„API-kulcs létrehozása”</strong> (<em>Create API key</em>) gombra. Ha projektet kér, válassza az új projekt létrehozását, vagy a felkínált alapértelmezettet.</li>
+        <li>Megjelenik a kulcs: egy hosszú betű-szám sor (gyakran <code>AIza…</code> kezdetű, de a Google más formátumot is használhat). Kattintson a <strong>másolás</strong> ikonra, hogy a teljes kulcsot kimásolja.</li>
+        <li><strong>Illessze be az alábbi mezőbe</strong>, és kattintson a „Kulcs kipróbálása” gombra. Ha zöld üzenetet kap, készen van – menjen a <a href="tema.html?t=szazalek#gyakorlas">Gyakorlás</a> fülre.</li>
+      </ol>
+      <p class="figyelmeztetes">Az ingyenes szinthez általában nem kell bankkártya. A pontos napi és percenkénti kereteket az AI Studio mutatja, és a Google időnként módosítja őket. Az oldal olcsó, „lite” modelleket használ, amelyekhez a legtöbb ingyenes kérés tartozik, és ha az egyik keret elfogy, automatikusan a következő modellt próbálja.</p>
+    </section>
+
+    <section class="doboz" aria-labelledby="kulcsCim">
+      <h2 id="kulcsCim">A kulcs megadása</h2>
+      <form id="kulcsUrlap" novalidate>
+        <div class="mezo">
+          <label for="kulcsMezo">Gemini API-kulcs</label>
+          <div class="bevitel-sor">
+            <input type="password" id="kulcsMezo" name="gemini-kulcs" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="AIza…" aria-describedby="kulcsAllapot">
+            <button type="button" class="gomb halk" id="kulcsMutat" aria-pressed="false">Megmutat</button>
+          </div>
+        </div>
+        <label class="opcio"><input type="checkbox" id="kulcsMegjegyez"> <span>Jegyezze meg ezen a saját eszközön (különben a böngésző bezárásáig marad meg)</span></label>
+        <p class="figyelmeztetes">Közös gépen ne jelölje be.</p>
+        <div class="gombsor">
+          <button type="submit" class="gomb elsodleges">Mentés</button>
+          <button type="button" class="gomb" id="kulcsProba">Kulcs kipróbálása</button>
+          <button type="button" class="gomb halk" id="kulcsTorol">Kulcs törlése</button>
+        </div>
+        <p id="kulcsAllapot" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="doboz" aria-labelledby="biztCim">
+      <h2 id="biztCim">Adatvédelem és biztonság</h2>
+      <ul>
+        <li>A kulcs <strong>csak az Ön böngészőjében</strong> tárolódik, és kizárólag a Google felé megy, minden más helyre nem. Ennek az oldalnak nincs szervere, és nem gyűjt adatot.</li>
+        <li><strong>Ne ossza meg a kulcsot</strong> senkivel, és ne tegye ki nyilvános helyre (pl. üzenetbe, fórumba). Ha mégis kiszivárog, az AI Studióban törölheti, és újat készíthet.</li>
+        <li>Kérdéskor a feladat szövege, az Ön beírt válasza és a kérdése a Google Gemini szolgáltatáshoz kerül. Az ingyenes szinten a Google ezeket a szolgáltatás fejlesztésére is felhasználhatja, ezért <strong>személyes adatot ne írjon</strong> a kérdésbe.</li>
+      </ul>
+    </section>
+
+    <section class="doboz" aria-labelledby="hibaCim">
+      <h2 id="hibaCim">Ha valami nem működik</h2>
+      <dl class="gyik">
+        <dt>„A Google nem fogadta el az API-kulcsot”</dt>
+        <dd>Valószínűleg elgépelődött vagy csonka a kulcs. Másolja be újra a teljes kulcsot, felesleges szóköz nélkül, vagy készítsen újat.</dd>
+        <dt>„Elfogyott az ingyenes keret”</dt>
+        <dd>Percenként és naponta is van korlát. Várjon egy-két percet; ha a napi keret fogyott el, másnap újra működik. A „Miért így?” magyarázat és a tippek korlátlanul elérhetők.</dd>
+        <dt>„Nem sikerült elérni a Google szerverét”</dt>
+        <dd>Ellenőrizze az internetkapcsolatot. Egyes iskolai vagy céges hálózatok tiltják a Google AI-szolgáltatást – ilyenkor másik hálózaton próbálja.</dd>
+        <dt>Az AI Studio nem enged kulcsot készíteni</dt>
+        <dd>Iskolai/munkahelyi fiókon vagy a korhatár miatt előfordulhat. Próbálja saját, magán Google-fiókkal.</dd>
+      </dl>
+    </section>
+  </main>
+  <script type="module" src="js/oldal/ai-beallitas.js"></script>
+</body>
+</html>
