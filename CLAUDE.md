@@ -8,9 +8,9 @@ Böngészőben futó gyakorlóoldal a Kodolányi János Egyetem „Gazdasági ma
 index.html, tema.html?t=<id>, teszt.html, ai.html    oldalak (statikus, GitHub Pages a main gyökeréről)
 felveteli.html, felveteli-teszt.html                  a „Felvételi (8. évf.)” szekció: kezdőlap és próba felvételi (a témák a tema.html-en nyílnak)
 css/style.css                                         megjelenés (világos/sötét, „Nagy betű”)
-js/temak/                                             témák: szazalek, linearis, kozgazdasag, penzugy, exponencialis, fuggvenyvizsgalat, valoszinuseg (+ index.js, seged.js)
+js/temak/                                             témák: szazalek, linearis, kozgazdasag, penzugy, exponencialis, fuggvenyvizsgalat, valoszinuseg, mintavetel, normalis, donteselmelet (+ index.js, seged.js)
 js/felveteli/                                         felvételi-témák (8. évf.): szamok, mertekegyseg, szoveges, geometria, kombinatorika, aranyok (+ index.js, seged.js)
-js/lib/                                               szam, ellenorzo, abra (koordinataRendszer: görbék/sávok/vízszintes vonal, eloszlasAbra), haladas, teszt-osszeallito, gemini, ai-kulcs, markdown-lite
+js/lib/                                               szam, ellenorzo, abra (koordinataRendszer: görbék/sávok/vízszintes vonal, eloszlasAbra: kiszínezett oszlopok, haranAbra: normális harang, eloszlas: binomiális/hipergeometrikus/normális számolás), haladas, teszt-osszeallito, gemini, ai-kulcs, markdown-lite
 js/oldal/                                             oldalkezelők (tema.js, teszt.js, kezdo.js, ai-panel.js, ai-beallitas.js, feladat-nezet.js, kozos.js)
 tests/                                                node --test egységtesztek
 ```
@@ -21,7 +21,7 @@ tests/                                                node --test egységtesztek
 ## Tesztek és ellenőrzés
 
 - `node --test` (Node 20+), jelenleg 289 teszt, mind zöld legyen push előtt. Futásidő ~1–2 perc; hosszabb parancsnál adj elég időkorlátot.
-- A generált feladatok helyes válaszát a tesztek **a feladat szövegéből visszaolvasott számokból, a generátortól függetlenül** számolják újra (`tests/generatorok.test.js` az 1–3. témára; a 4–7. témának külön, toleranciát kezelő fájlja van: `penzugy`, `exponencialis`, `fuggvenyvizsgalat`, `valoszinuseg`). A 6. témánál a darabszám-határokat egész értékek behelyettesítésével ellenőrizzük, nem a generátor képletével.
+- A generált feladatok helyes válaszát a tesztek **a feladat szövegéből visszaolvasott számokból, a generátortól függetlenül** számolják újra (`tests/generatorok.test.js` az 1–3. témára; a 4–7. témának külön, toleranciát kezelő fájlja van: `penzugy`, `exponencialis`, `fuggvenyvizsgalat`, `valoszinuseg`; a 8–10. témának `eloszlas`, `mintavetel`, `normalis`, `donteselmelet`). A 6. témánál a darabszám-határokat egész értékek behelyettesítésével ellenőrizzük, nem a generátor képletével.
 - `tests/magyarazat.test.js` minden feladattípusra ellenőrzi a „Miért így?” magyarázatot, az ellenpróbát és a kérdés formájú első tippet. Új típusnál ezek kötelezők.
 - UI-ellenőrzés böngészőben: `python3 -m http.server 8765` a repo gyökerében, majd Playwright (Chromium előre telepítve: `$PLAYWRIGHT_BROWSERS_PATH/chromium`, modul: `/opt/node-tools/node_modules/playwright`; ESM-ből `import pkg from '…/playwright/index.js'; const { chromium } = pkg;`, `executablePath` megadásával). Nézd meg asztali (1280 px) és mobil (375 px) nézetben, ellenőrizd, hogy nincs vízszintes görgetés és konzolhiba. Ne futtass `playwright install`-t.
 
@@ -54,6 +54,16 @@ Minden típus kapjon: `magyarazat` (3–5 bekezdés, a feladat konkrét számaiv
 - A kulcs alakellenőrzése **szándékosan engedékeny** (a Google kulcsformátuma változik; egy szigorú `AIza…` ellenőrzés valódi kulcsot is elutasított). Az érvényességet a „Kulcs kipróbálása” (valódi hívás) dönti el.
 - A modellnevek (`MODELLEK`: `gemini-3.5-flash-lite`, `gemini-3.1-flash-lite`, `gemini-2.5-flash-lite`) a Python-vizsgafelkészítő repóból származnak, **élő hívással nem lettek ellenőrizve**. Kvótahiba (429) és elérhetetlen modell (404/5xx) esetén a következő modellre lép. Ha a Google átnevez egy modellt, a listát kell módosítani.
 - A modell a helyes végeredményt csak a rendszerutasításban kapja meg, és csak a megoldás megnézése után / kérésre árulhatja el. A próbatesztben nincs AI.
+
+## v5 témák (8–10.) – tanulságok
+
+- **`js/lib/eloszlas.js`**: függőség nélküli binomiális/hipergeometrikus (`pmf`, kumulált, μ, σ, módusz) és normális (`erf` nemnegatív tagú sorral, `kvantilis`: Acklam + Halley) számolás. A tesztek (`tests/eloszlas.test.js`) a SPEC ~75 értékét adják vissza; a téma-tesztek a helyes választ **BigInt-kombinációkkal, illetve Simpson-integrállal** számolják újra, nem ezzel a modullal.
+- **Határ számít (diszkrét)**: `FELTETELEK` (pontosan / több mint / kevesebb mint / legalább / legfeljebb) adja a helyes és a „félreértett” tartományt; az ábrán a félreértett oszlop narancs, a tévedés célzott üzenetet kap. A szituációk szövegében a számok sorrendje rögzített (N, M, n, k), ezt olvassák vissza a tesztek.
+- **Ellenőrző bővítések** (`ellenorzo.js`): `szazalek` (21,49 % elfogadva megjegyzéssel), `abszTures` a saját pontosságával kiírva (±0,0001), `egesz` (tizedes tört nem kerekítődik jóra – módusz, egész határok), `maximum` (valószínűség ≤ 1), `egyebUzenet` (minden más rossz érték célzott üzenete – N5). Százalék és a ±0,0001 tűrés miatt a ×100-szoros értékek elvileg összetéveszthetők; a tesztek ezt a ritka egybeesést kihagyják.
+- **Normális**: a határok `μ + zσ` „kerek” értékek (legfeljebb 2 tizedes); a fordított kérdéseknél a GeoGebrában a valószínűséget írjuk be. `haranAbra` a kérdezett területet színezi, a szimmetrikus kérdésnél a két kimaradó „fecni” `masik` színű.
+- **Döntéselmélet**: a döntési táblázat HTML a feladatszövegben (`tablaHtml`; a cellák között szóköz, hogy a tesztek és az AI is olvassák), a megoldásban kiemelt változata az `abraMegoldas`. Holtverseny: a választós mezőben mindig van egy „X vagy Y” opció (holtversenynél ez a jó, különben csalétek). Mobilon a táblázat kis betűvel fér el: rövid oszlopfejlécek (`max`, `min`, `elm.`, `érték`) és az `esély` sor.
+- **GeoGebra (8–9.)**: a `geogebra.bevezeto` mondja ki, hogy a Valószínűség-számítás nézet beállításairól van szó (nem beviteli sorról); a sor a SPEC mintája szerint „Hipergeometrikus · populáció: 32 · n: 4 · minta: 8 · két érték között: 2 ≤ X ≤ 2”. Élő GeoGebrában nem lett kipróbálva.
+- **Próbateszt**: 10 témából pontosan 1 feladat; `D1` (optimista) és a csak választós típusok (`M1`, `N9`, `D8`, + a korábbiak) `tesztbe: false`.
 
 ## v4 témák (5–7.) – tanulságok
 

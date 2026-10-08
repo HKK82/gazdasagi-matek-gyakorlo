@@ -7,7 +7,7 @@ import * as haladas from '../js/lib/haladas.js';
 import { ellenoriz, helyesValaszSzoveg } from '../js/lib/ellenorzo.js';
 import { formaz } from '../js/lib/szam.js';
 
-test('próbateszt: 10 feladat, 20 perc, arányos elosztás a 7 témából (minden témából legalább 1, legfeljebb 2)', () => {
+test('próbateszt: 10 feladat, 20 perc, arányos elosztás (7 témánál legalább 1, legfeljebb 2; a 10 témából pontosan 1)', () => {
   assert.equal(TESZT_DB, 10);
   assert.equal(TESZT_PERC, 20);
   for (let mag = 1; mag <= 200; mag++) {
@@ -19,10 +19,14 @@ test('próbateszt: 10 feladat, 20 perc, arányos elosztás a 7 témából (minde
     assert.deepEqual([...elosztas(ujRng(mag), 3, 10)].sort(), [3, 3, 4]);
     const lista = tesztFeladatok(ujRng(mag), TEMAK, 10);
     assert.equal(lista.length, 10);
+    assert.equal(TEMAK.length, 10);
+    assert.deepEqual(elosztas(ujRng(mag), 10, 10), Array(10).fill(1));
     for (const t of TEMAK) {
       const n = lista.filter((x) => x.temaId === t.id).length;
-      assert.ok(n === 1 || n === 2, `${t.id}: ${n} feladat`);
+      assert.equal(n, 1, `${t.id}: ${n} feladat – a 10 témából pontosan 1`);
     }
+    // a 10. témából az optimista elv (D1) nem kerülhet a próbatesztbe, és a választós típusok sem
+    for (const x of lista) assert.ok(!['D1', 'D8', 'M1', 'N9', 'E9', 'V8', 'L8'].includes(x.tipusId), x.tipusId);
     for (const { feladat } of lista) {
       assert.equal(feladat.mezok.length, 1, 'egyetlen számot kell beírni');
       assert.equal(feladat.mezok[0].tipus, 'szam');
@@ -36,6 +40,16 @@ test('próbateszt: 10 feladat, 20 perc, arányos elosztás a 7 témából (minde
       assert.equal(new Set(tip).size, tip.length);
     }
   }
+});
+
+test('próbateszt: a 10. témából (döntéselmélet) a D2–D7 típusok kerülhetnek be, a D1 és a D8 soha', () => {
+  const lattak = new Set();
+  for (let mag = 1; mag <= 600; mag++) {
+    const lista = tesztFeladatok(ujRng(mag), TEMAK, 10);
+    const d = lista.find((x) => x.temaId === 'donteselmelet');
+    lattak.add(d.tipusId);
+  }
+  assert.deepEqual([...lattak].sort(), ['D2', 'D3', 'D4', 'D5', 'D6', 'D7']);
 });
 
 test('próbateszt: újraindításkor új számok', () => {

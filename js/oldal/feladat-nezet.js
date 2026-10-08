@@ -20,14 +20,15 @@ export function miertElem(feladat, nyitva = false) {
 /**
  * „GeoGebrában így” – lenyitható doboz a konkrét, kimásolható beírandó sorokkal (tizedespontos számokkal).
  * Az oldal nem ágyazza be a GeoGebrát (nincs külső kérés), csak a beírandó sorokat adja.
- * feladat.geogebra = { sorok: ['f(x)=100*1.124^x', …], megjegyzes?: '…' }
+ * feladat.geogebra = { sorok: ['f(x)=100*1.124^x', …], megjegyzes?: '…', bevezeto?: '…' }
+ * (a v5 témáknál a sorok a Valószínűség-számítás nézet beállításait írják le, a `bevezeto` ezt mondja ki)
  */
 export function geogebraElem(feladat) {
   const g = feladat.geogebra;
   if (!g || !g.sorok || !g.sorok.length) return null;
   return el('details', { class: 'geogebra' },
     el('summary', { text: 'GeoGebrában így' }),
-    el('p', { class: 'figyelmeztetes', text: 'Írja be egymás után a beviteli sorba (tizedesponttal!), és Enterrel hagyja jóvá:' }),
+    el('p', { class: 'figyelmeztetes', text: g.bevezeto || 'Írja be egymás után a beviteli sorba (tizedesponttal!), és Enterrel hagyja jóvá:' }),
     g.sorok.map((sor) => {
       const gomb = el('button', { type: 'button', class: 'gomb halk', 'aria-label': `Másolás: ${sor}` }, 'Másolás');
       gomb.addEventListener('click', async () => {

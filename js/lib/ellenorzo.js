@@ -23,6 +23,7 @@ export function egyezik(v, cel, tizedes) {
 export function szamMezo({
   id = 'v', cimke, helyes, tizedes = 2, elojel = 'sima', egyseg = '', hibak = [],
   alternativ = [], elojelUzenet = '', negativ = false, abszTures = 0, relTures = 0, ellenproba = null,
+  szazalek = false, egyebUzenet = '', egesz = false, egeszUzenet = '', maximum, maximumUzenet = '',
 }) {
   const tiszta = [];
   // egy tipikus hiba csak akkor marad, ha a kért pontosság mellett nem fogadnánk el helyesnek
@@ -35,13 +36,16 @@ export function szamMezo({
     if (!Number.isFinite(h.ertek)) continue;
     if (kozel(h.ertek, helyes) || abszKozel(h.ertek, helyes)) continue;
     if (alternativ.some((a) => kozel(h.ertek, a))) continue;
+    if (szazalek && (kozel(h.ertek / 100, helyes) || abszKozel(h.ertek / 100, helyes))) continue;
     if (elojel !== 'sima' && kozel(h.ertek, -helyes)) continue;
     if (tiszta.some((t) => kozel(t.ertek, h.ertek))) continue;
     tiszta.push(h);
   }
   return {
     tipus: 'szam', id, cimke, helyes, tizedes, elojel, egyseg, hibak: tiszta,
-    alternativ, elojelUzenet, abszTures, relTures,
+    alternativ, elojelUzenet, abszTures, relTures, szazalek, egyebUzenet,
+    // egesz: csak egész szám a jó (a tizedes tört nem kerekítődik jóra); maximum: a valószínűségnél 1
+    egesz, egeszUzenet, maximum, maximumUzenet,
     // ellenproba(v): a hallgató saját számával mutatja meg szövegesen, miért nem stimmel (lásd SPEC 3.2)
     ellenproba: typeof ellenproba === 'function' ? ellenproba : null,
     negativ: negativ || helyes < 0 || elojel !== 'sima',
@@ -89,6 +93,10 @@ export function ellenoriz(mezo, bevitel) {
   const v = p.ertek;
   const d = mezo.tizedes;
 
+  if (mezo.egesz && Math.abs(v - Math.round(v)) > 1e-9) {
+    return { allapot: 'tipikus', uzenet: mezo.egeszUzenet || 'Ide egész szám kell.', ertek: v, ellenproba: ellenprobaSzoveg(mezo, v) };
+  }
+
   if (egyezik(v, mezo.helyes, d) || (mezo.alternativ || []).some((a) => egyezik(v, a, d))) {
     return { allapot: 'jo', uzenet: '', ertek: v };
   }
@@ -111,9 +119,18 @@ export function ellenoriz(mezo, bevitel) {
     }
   }
   if (mezo.abszTures > 0 && Math.abs(v - mezo.helyes) <= mezo.abszTures + 1e-9) {
+    // a tűrés kiírása a saját pontosságával: ±1 Ft, de ±0,0001 vagy ±0,01
+    const td = mezo.abszTures >= 1 ? 0 : Math.max(d, Math.ceil(-Math.log10(mezo.abszTures) - 1e-9));
     return {
       allapot: 'jo-megjegyzes', ertek: v,
-      uzenet: `Elfogadva. A kerekítés miatt ±${formaz(mezo.abszTures, 0)}${mezo.egyseg ? ' ' + mezo.egyseg : ''} eltérés előfordulhat; a pontos érték ${formaz(mezo.helyes, d)}${mezo.egyseg ? ' ' + mezo.egyseg : ''}.`,
+      uzenet: `Elfogadva. A kerekítés miatt ±${formaz(mezo.abszTures, td)}${mezo.egyseg ? ' ' + mezo.egyseg : ''} eltérés előfordulhat; a pontos érték ${formaz(mezo.helyes, d)}${mezo.egyseg ? ' ' + mezo.egyseg : ''}.`,
+    };
+  }
+  // valószínűség százalék alakban (21,49 % a 0,2149 helyett): elfogadjuk, megjegyzéssel
+  if (mezo.szazalek && (egyezik(v / 100, mezo.helyes, d) || (mezo.abszTures > 0 && Math.abs(v / 100 - mezo.helyes) <= mezo.abszTures + 1e-9))) {
+    return {
+      allapot: 'jo-megjegyzes', ertek: v,
+      uzenet: `Elfogadva. A ${formaz(v, 2)} % ugyanaz, mint ${formaz(mezo.helyes, d)}; a valószínűséget a munkafüzet tizedes törtként (0 és 1 között) kéri.`,
     };
   }
   if (mezo.relTures > 0 && Math.abs(v - mezo.helyes) <= mezo.relTures * Math.abs(mezo.helyes) + 1e-9) {
@@ -127,6 +144,11 @@ export function ellenoriz(mezo, bevitel) {
     // h.tures: a hibához tartozó saját tűrés (pl. százalék alakban kerekítve beírt érték)
     if (egyezik(v, h.ertek, d) || (h.tures > 0 && Math.abs(v - h.ertek) <= h.tures)) return { allapot: 'tipikus', uzenet: h.uzenet, ertek: v, ellenproba };
   }
+  if (mezo.maximum !== undefined && v > mezo.maximum + 1e-9) {
+    return { allapot: 'tipikus', uzenet: mezo.maximumUzenet || `Ez legfeljebb ${formaz(mezo.maximum, 0)} lehet.`, ertek: v, ellenproba };
+  }
+  // minden más rossz érték is ugyanazt a célzott visszajelzést kapja (pl. folytonos változó pontos értéke)
+  if (mezo.egyebUzenet) return { allapot: 'tipikus', uzenet: mezo.egyebUzenet, ertek: v, ellenproba };
   return { allapot: 'rossz', uzenet: UZENET.rossz, ertek: v, ellenproba };
 }
 

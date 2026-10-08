@@ -7,9 +7,12 @@ import penzugy from './penzugy.js';
 import exponencialis from './exponencialis.js';
 import fuggvenyvizsgalat from './fuggvenyvizsgalat.js';
 import valoszinuseg from './valoszinuseg.js';
+import mintavetel from './mintavetel.js';
+import normalis from './normalis.js';
+import donteselmelet from './donteselmelet.js';
 import { FELVETELI_TEMAK } from '../felveteli/index.js';
 
-export const TEMAK = [szazalek, linearis, kozgazdasag, penzugy, exponencialis, fuggvenyvizsgalat, valoszinuseg];
+export const TEMAK = [szazalek, linearis, kozgazdasag, penzugy, exponencialis, fuggvenyvizsgalat, valoszinuseg, mintavetel, normalis, donteselmelet];
 export { FELVETELI_TEMAK };
 
 export function temaKeres(id) {

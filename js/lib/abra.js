@@ -139,24 +139,36 @@ export function koordinataRendszer(o) {
 /**
  * Eloszlás oszlopdiagramja: x = a változó értékei (pl. nyeremény), magasság = valószínűség,
  * a várható érték függőleges szaggatott vonallal.
- * @param {{ ertekek: Array<{x:number,p:number}>, varhato?: number, xfelirat?: string, leiras?: string, szel?: number, mag?: number }} o
+ * Diszkrét eloszláshoz (8. téma) bővítve: `diszkret` (szorosan álló oszlopok), `kiemelt` / `masik` (kiszínezett oszlopok:
+ * a kérdezett, illetve a hallgató által tévesen beleértett oszlop), `cimkek` ('mind' | 'kiemelt' | 'nincs'),
+ * `felirat` (pl. „P(X ≥ 3) = 0,3085”), `jelmagyarazat` ([{ osztaly: 'kiemelt'|'masik', szoveg }]), `varhatoCimke`.
+ * @param {{ ertekek: Array<{x:number,p:number}>, varhato?: number, xfelirat?: string, leiras?: string, szel?: number, mag?: number,
+ *   diszkret?: boolean, kiemelt?: number[], masik?: number[], cimkek?: string, felirat?: string,
+ *   jelmagyarazat?: Array<{osztaly:string,szoveg:string}>, varhatoCimke?: string }} o
  */
 export function eloszlasAbra(o) {
-  const { ertekek, varhato, xfelirat = 'érték', leiras = 'Eloszlás oszlopdiagramja', szel = 520, mag = 340 } = o;
+  const {
+    ertekek, varhato, xfelirat = 'érték', leiras = 'Eloszlás oszlopdiagramja', szel = 520, mag = 340,
+    diszkret = false, kiemelt = [], masik = [], felirat = '', jelmagyarazat = [], varhatoCimke,
+  } = o;
+  const cimkek = o.cimkek || (ertekek.length > 8 && (o.kiemelt || o.masik) ? 'kiemelt' : ertekek.length > 12 ? 'kiemelt' : 'mind');
   const id = 'elo' + (++szamlalo);
   void id;
-  const bal = 56, jobb = 24, fent = 34, lent = 54;
+  const bal = 56, jobb = 24, fent = felirat || jelmagyarazat.length ? 54 : 34, lent = 54;
   const W = szel - bal - jobb, H = mag - fent - lent;
   const xs = ertekek.map((e) => e.x);
   const kozep = varhato === undefined ? xs : [...xs, varhato];
   const kicsi = Math.min(...kozep), nagy = Math.max(...kozep);
   const tav = Math.max(nagy - kicsi, 1);
-  const xmin = kicsi - tav * 0.2, xmax = nagy + tav * 0.2;
+  const pad = diszkret ? 0.8 : tav * 0.2;
+  const xmin = kicsi - pad, xmax = nagy + pad;
   const pmax = Math.max(...ertekek.map((e) => e.p));
   const ymax = Math.min(1, Math.ceil((pmax + 0.05) * 10) / 10);
   const px = (x) => bal + ((x - xmin) / (xmax - xmin)) * W;
   const py = (p) => fent + H - (p / ymax) * H;
-  const sav = Math.min(W / (ertekek.length * 2.2), 70);
+  const sav = diszkret
+    ? Math.max(2, Math.min(70, (0.82 * W) / (xmax - xmin)))
+    : Math.min(W / (ertekek.length * 2.2), 70);
   const r = [];
   r.push(`<svg class="abra" viewBox="0 0 ${szel} ${mag}" role="img" aria-label="${esc(leiras)}" xmlns="http://www.w3.org/2000/svg"><title>${esc(leiras)}</title>`);
   const lepes = ymax <= 0.5 ? 0.1 : 0.2;
@@ -166,17 +178,84 @@ export function eloszlasAbra(o) {
   }
   r.push(`<line class="abra-tengely" x1="${bal}" y1="${py(0)}" x2="${bal + W}" y2="${py(0)}"/>`);
   r.push(`<line class="abra-tengely" x1="${bal}" y1="${fent - 6}" x2="${bal}" y2="${py(0)}"/>`);
-  for (const e of ertekek) {
-    r.push(`<rect class="abra-oszlop" x="${px(e.x) - sav / 2}" y="${py(e.p)}" width="${sav}" height="${py(0) - py(e.p)}"><title>${esc(`${formaz(e.x, 2)}: ${formaz(e.p, 4)}`)}</title></rect>`);
-    r.push(`<text class="abra-cimke" x="${px(e.x)}" y="${py(e.p) - 7}" text-anchor="middle">${formaz(e.p, 4)}</text>`);
-    r.push(`<text class="abra-skala" x="${px(e.x)}" y="${py(0) + 18}" text-anchor="middle">${formaz(e.x, 2)}</text>`);
-  }
+  // sok oszlopnál nem minden x-érték kap feliratot
+  const xlepes = ertekek.length > 24 ? 5 : ertekek.length > 12 ? 2 : 1;
+  const szinezett = kiemelt.length > 0 || masik.length > 0;
+  ertekek.forEach((e, i) => {
+    const osztaly = masik.includes(e.x) ? ' masik' : kiemelt.includes(e.x) ? ' kiemelt' : szinezett ? ' szurke' : '';
+    r.push(`<rect class="abra-oszlop${osztaly}" x="${px(e.x) - sav / 2}" y="${py(e.p)}" width="${sav}" height="${Math.max(0, py(0) - py(e.p))}"><title>${esc(`${formaz(e.x, 2)}: ${formaz(e.p, 4)}`)}</title></rect>`);
+    const cimkezett = cimkek === 'mind' || (cimkek === 'kiemelt' && (kiemelt.includes(e.x) || masik.includes(e.x)));
+    if (cimkezett && e.p > 0) r.push(`<text class="abra-cimke" x="${px(e.x)}" y="${py(e.p) - 7}" text-anchor="middle">${formaz(e.p, 4)}</text>`);
+    if (!diszkret || i % xlepes === 0 || kiemelt.includes(e.x) || masik.includes(e.x)) {
+      r.push(`<text class="abra-skala" x="${px(e.x)}" y="${py(0) + 18}" text-anchor="middle">${formaz(e.x, 2)}</text>`);
+    }
+  });
   if (varhato !== undefined) {
     r.push(`<line class="abra-seged" x1="${px(varhato)}" y1="${fent - 6}" x2="${px(varhato)}" y2="${py(0)}"/>`);
-    r.push(`<text class="abra-cimke v2" x="${px(varhato) + 5}" y="${fent + 8}">M(X) = ${formaz(varhato, 2)}</text>`);
+    r.push(`<text class="abra-cimke v2" x="${px(varhato) + 5}" y="${fent + 8}">${esc(varhatoCimke || `M(X) = ${formaz(varhato, 2)}`)}</text>`);
   }
   r.push(`<text class="abra-felirat" x="${bal + W / 2}" y="${mag - 8}" text-anchor="middle">${esc(xfelirat)}</text>`);
   r.push(`<text class="abra-felirat" x="${bal}" y="${fent - 16}">valószínűség</text>`);
+  if (felirat) r.push(`<text class="abra-felirat" x="${bal + W}" y="${fent - 30}" text-anchor="end">${esc(felirat)}</text>`);
+  // jelmagyarázat: kis színes négyzetek a felirat alatt
+  let jx = bal + W;
+  for (const j of [...jelmagyarazat].reverse()) {
+    const szel2 = 22 + j.szoveg.length * 6.6;
+    jx -= szel2;
+    r.push(`<rect class="abra-oszlop ${esc(j.osztaly)}" x="${jx}" y="${fent - 24}" width="12" height="12"/>`);
+    r.push(`<text class="abra-skala" x="${jx + 17}" y="${fent - 13}">${esc(j.szoveg)}</text>`);
+  }
+  r.push('</svg>');
+  return r.join('');
+}
+
+/**
+ * Normális eloszlás harangja: a sűrűségfüggvény görbéje, kiszínezett területekkel (a kérdezett rész: `kiemelt`,
+ * a másik – pl. a szimmetrikus kérdésnél a két kimaradó „fecni” – `masik`), μ és a határok feliratozva.
+ * @param {{ mu: number, sigma: number, savok?: Array<{a:number,b:number,osztaly?:string}>, hatarok?: Array<{x:number,cimke?:string}>,
+ *   xfelirat?: string, felirat?: string, leiras?: string, szel?: number, mag?: number, tizedes?: number }} o
+ */
+export function haranAbra(o) {
+  const { mu, sigma, savok = [], hatarok = [], xfelirat = 'érték', felirat = '', leiras = 'Normális eloszlás sűrűségfüggvénye', szel = 520, mag = 300, tizedes = 2 } = o;
+  const bal = 24, jobb = 24, fent = felirat ? 46 : 30, lent = 52;
+  const W = szel - bal - jobb, H = mag - fent - lent;
+  const kezd = mu - 3.6 * sigma, veg = mu + 3.6 * sigma;
+  const fmax = 1 / (sigma * Math.sqrt(2 * Math.PI));
+  const px = (x) => bal + ((x - kezd) / (veg - kezd)) * W;
+  const py = (y) => fent + H - (y / (fmax * 1.12)) * H;
+  const sur = (x) => fmax * Math.exp(-0.5 * ((x - mu) / sigma) ** 2);
+  const r = [];
+  r.push(`<svg class="abra" viewBox="0 0 ${szel} ${mag}" role="img" aria-label="${esc(leiras)}" xmlns="http://www.w3.org/2000/svg"><title>${esc(leiras)}</title>`);
+  // kiszínezett területek a görbe alatt (poligon a görbe és a tengely között)
+  for (const b of savok) {
+    const a = Math.max(b.a, kezd), c = Math.min(b.b, veg);
+    if (c <= a) continue;
+    const pts = [`${px(a).toFixed(2)},${py(0).toFixed(2)}`];
+    const n = 80;
+    for (let i = 0; i <= n; i++) { const x = a + ((c - a) * i) / n; pts.push(`${px(x).toFixed(2)},${py(sur(x)).toFixed(2)}`); }
+    pts.push(`${px(c).toFixed(2)},${py(0).toFixed(2)}`);
+    r.push(`<polygon class="abra-terulet ${esc(b.osztaly || 'kiemelt')}" points="${pts.join(' ')}"/>`);
+  }
+  // a görbe
+  const gorbe = [];
+  for (let i = 0; i <= 200; i++) { const x = kezd + ((veg - kezd) * i) / 200; gorbe.push(`${px(x).toFixed(2)},${py(sur(x)).toFixed(2)}`); }
+  r.push(`<polyline class="abra-gorbe" points="${gorbe.join(' ')}"/>`);
+  r.push(`<line class="abra-tengely" x1="${bal}" y1="${py(0)}" x2="${bal + W}" y2="${py(0)}"/>`);
+  // skála: μ ± kσ (k = 0…3)
+  for (let k = -3; k <= 3; k++) {
+    const x = mu + k * sigma;
+    r.push(`<line class="abra-tengely" x1="${px(x)}" y1="${py(0)}" x2="${px(x)}" y2="${py(0) + 5}"/>`);
+    r.push(`<text class="abra-skala" x="${px(x)}" y="${py(0) + 19}" text-anchor="middle">${formaz(x, 3)}</text>`);
+  }
+  // μ és a határok
+  r.push(`<line class="abra-seged" x1="${px(mu)}" y1="${py(sur(mu))}" x2="${px(mu)}" y2="${py(0)}"/>`);
+  r.push(`<text class="abra-cimke" x="${px(mu)}" y="${py(sur(mu)) - 8}" text-anchor="middle">μ = ${formaz(mu, 3)}</text>`);
+  for (const h of hatarok) {
+    r.push(`<line class="abra-seged v2" x1="${px(h.x)}" y1="${py(sur(h.x))}" x2="${px(h.x)}" y2="${py(0)}"/>`);
+    r.push(`<text class="abra-cimke v2" x="${px(h.x)}" y="${py(0) - 8}" text-anchor="middle">${esc(h.cimke ?? formaz(h.x, tizedes))}</text>`);
+  }
+  r.push(`<text class="abra-felirat" x="${bal + W / 2}" y="${mag - 8}" text-anchor="middle">${esc(xfelirat)}</text>`);
+  if (felirat) r.push(`<text class="abra-felirat" x="${bal + W}" y="${fent - 22}" text-anchor="end">${esc(felirat)}</text>`);
   r.push('</svg>');
   return r.join('');
 }
