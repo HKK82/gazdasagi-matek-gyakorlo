@@ -6,10 +6,8 @@ Böngészőben futó gyakorlóoldal a Kodolányi János Egyetem „Gazdasági ma
 
 ```
 index.html, tema.html?t=<id>, teszt.html, ai.html    oldalak (statikus, GitHub Pages a main gyökeréről)
-felveteli.html, felveteli-teszt.html                  a „Felvételi (8. évf.)” szekció: kezdőlap és próba felvételi (a témák a tema.html-en nyílnak)
 css/style.css                                         megjelenés (világos/sötét, „Nagy betű”)
 js/temak/                                             témák: szazalek, linearis, kozgazdasag, penzugy, exponencialis, fuggvenyvizsgalat, valoszinuseg (+ index.js, seged.js)
-js/felveteli/                                         felvételi-témák (8. évf.): szamok, mertekegyseg, szoveges, geometria, kombinatorika, aranyok (+ index.js, seged.js)
 js/lib/                                               szam, ellenorzo, abra (koordinataRendszer: görbék/sávok/vízszintes vonal, eloszlasAbra), haladas, teszt-osszeallito, gemini, ai-kulcs, markdown-lite
 js/oldal/                                             oldalkezelők (tema.js, teszt.js, kezdo.js, ai-panel.js, ai-beallitas.js, feladat-nezet.js, kozos.js)
 tests/                                                node --test egységtesztek
@@ -20,7 +18,7 @@ tests/                                                node --test egységtesztek
 
 ## Tesztek és ellenőrzés
 
-- `node --test` (Node 20+), jelenleg 289 teszt, mind zöld legyen push előtt. Futásidő ~1–2 perc; hosszabb parancsnál adj elég időkorlátot.
+- `node --test` (Node 20+), jelenleg 209 teszt, mind zöld legyen push előtt. Futásidő ~1–2 perc; hosszabb parancsnál adj elég időkorlátot.
 - A generált feladatok helyes válaszát a tesztek **a feladat szövegéből visszaolvasott számokból, a generátortól függetlenül** számolják újra (`tests/generatorok.test.js` az 1–3. témára; a 4–7. témának külön, toleranciát kezelő fájlja van: `penzugy`, `exponencialis`, `fuggvenyvizsgalat`, `valoszinuseg`). A 6. témánál a darabszám-határokat egész értékek behelyettesítésével ellenőrizzük, nem a generátor képletével.
 - `tests/magyarazat.test.js` minden feladattípusra ellenőrzi a „Miért így?” magyarázatot, az ellenpróbát és a kérdés formájú első tippet. Új típusnál ezek kötelezők.
 - UI-ellenőrzés böngészőben: `python3 -m http.server 8765` a repo gyökerében, majd Playwright (Chromium előre telepítve: `$PLAYWRIGHT_BROWSERS_PATH/chromium`, modul: `/opt/node-tools/node_modules/playwright`; ESM-ből `import pkg from '…/playwright/index.js'; const { chromium } = pkg;`, `executablePath` megadásával). Nézd meg asztali (1280 px) és mobil (375 px) nézetben, ellenőrizd, hogy nincs vízszintes görgetés és konzolhiba. Ne futtass `playwright install`-t.
@@ -64,16 +62,6 @@ Minden típus kapjon: `magyarazat` (3–5 bekezdés, a feladat konkrét számaiv
 - **Változatválasztás `probal`-on kívül**: ha egy típus több története közül választ (pl. profit vagy átlagköltség), a változatot a `probal` *előtt* sorsold, különben a gyakrabban érvényes változat felülreprezentált lesz.
 - **Menü**: a témák a fejléc „Témák” lenyílójában vannak (`.nav-temak`); új téma = új link mind az 5 HTML-ben (index, tema, teszt, ai) – a `tema.js` az aktív linket magától jelöli.
 - **Próbateszt**: 7 témából legalább 1, legfeljebb 2 feladat; a csak választós típusok (`E9`, `V8`, `L8`) `tesztbe: false`.
-
-## Felvételi szekció (8. évfolyam, `js/felveteli/`)
-
-- A tartalom a központi írásbeli felvételi matematika feladatsorok (Mat1/Mat2, 2004–2023; a PDF-ek a felhasználó zip-jében voltak, nincsenek a repóban) visszatérő feladattípusaiból készült, **generált, véletlen számokkal** – nem az eredeti feladatok másolata. Ábrás/táblázatos eredeti feladatok szövegesen jelennek meg.
-- Ugyanaz a modulszerkezet, mint a `js/temak/`-ban; a témák `id`-je `fv-` előtagú, és `sor: 'felveteli'` mezőt kapnak. `temaKeres` mindkét listában keres, így a `tema.html?t=fv-…` változtatás nélkül működik. A `tema.js` a `sor` alapján tegező szöveget használ, a vissza-link `felveteli.html`-re mutat, és a `sor` az AI-asszisztensnek is átmegy (tegező, 8. osztályos hangnem).
-- **Tegező forma** (a felhasználók 13–14 évesek, mint a valódi feladatlapon: „Határozd meg…”), a gazdasági részek semleges felszólító formájával szemben. A megosztott `ellenorzo.js` hibaüzenetei (pl. „Még nem írt be választ”) viszont a gazdasági részével közösek, ezek maradtak.
-- Próba felvételi: `felveteli-teszt.html` (`<body data-sor="felveteli">`) ugyanazt a `teszt.js`-t használja, mint a `teszt.html`; 12 feladat (mind a 6 témából 2), 45 perc (`FELV_TESZT_*`), külön legjobb eredmény (`haladas.js`: `legjobbTeszt('felvTeszt')`). A felvételi haladás törlése (`torolFelveteli`) a gazdasági haladást nem érinti.
-- Tört alakú eredmény (pl. 7/6) a `szam.js` `ertelmez`-ével megy; ilyenkor `tizedes: 3` és `TORT_UTASITAS` a gyakorlásban.
-- Tesztek: `tests/felveteli.test.js` (a szövegből visszaolvasott számokkal, nyers erővel/szimulációval újraszámolva: sorrendek felsorolása, kis kockák felszíne, percenkénti mozgás-szimuláció stb.); a „Miért így?” és a nyelvi csapdák tesztje (`magyarazat.test.js`) és a példák tesztje (`peldak.test.js`) a felvételi témákra is fut.
-- **Nyelvi csapda a szövegekben:** a „−” művelet-jel a `segito.js` `szamok()`-jában előjelként olvasódik (a felvételi tesztek `Math.abs`-t használnak); évszámos/egységes mondatoknál a számok után nincs toldalék (`6-ed` helyett átfogalmazás).
 
 ## Ismert nyitott pontok
 - Az AI élő kipróbálása valódi kulccsal még nem történt meg a fejlesztői környezetből (hálózati korlát miatt).
