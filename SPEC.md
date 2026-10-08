@@ -7,7 +7,7 @@ Ez a fájl a megrendelő (oktató) igényeit és a teljes szakmai tartalmat írj
 - Böngészőben futó **gyakorlóoldal** a Kodolányi János Egyetem „Gazdasági matematika” tárgyához.
 - Felhasználók: felnőtt, levelezős hallgatók, sokan **nem matematikusok**. A hangnem barátságos, türelmes, magázó („Önök/Ön” helyett elég a semleges, felszólító forma: „Írja be…”, „Nézze meg…”).
 - Az oktató **online órán** is használja, ezért kivetítve is jól olvasható legyen (nagy betű, tiszta elrendezés).
-- Első verzió (v1, kész): **3 téma**. **v2 (kész): 4. téma – Pénzügyi számítások (kamatos kamat)**, lásd 5.4. **v4: 5. Exponenciális függvények, 6. Közgazdasági függvények vizsgálata, 7. Klasszikus valószínűség és valószínűségi változó**, lásd 5.5–5.7. Később újabb témák jönnek (mintavétel, normális eloszlás, döntéselmélet) → a tartalom legyen könnyen bővíthető (téma = külön adatfájl/modul).
+- Első verzió (v1, kész): **3 téma**. **v2 (kész): 4. téma – Pénzügyi számítások (kamatos kamat)**, lásd 5.4. **v4: 5. Exponenciális függvények, 6. Közgazdasági függvények vizsgálata, 7. Klasszikus valószínűség és valószínűségi változó**, lásd 5.5–5.7 (kész). **v5: 8. Mintavételek és eloszlásuk, 9. Normális eloszlás, 10. Döntéselmélet**, lásd 5.8–5.10 – ezzel a tárgy mind a 10 témája szerepel. A tartalom legyen könnyen bővíthető (téma = külön adatfájl/modul).
 
 ## 2. Technikai keretek
 
@@ -91,7 +91,7 @@ A régi Excel-munkafüzet hibáiból tanulva:
 
 ### 4.3 Próbateszt
 
-- 10 véletlen feladat az összes témából (arányosan; 4 témánál pl. 3/3/2/2; 7 témánál minden témából legalább 1, a maradék 3 véletlenszerűen, egy témából legfeljebb 2), **20 perc** időkorlát az egész tesztre (nem feladatonként – ezt ki is írja).
+- 10 véletlen feladat az összes témából (arányosan; 4 témánál pl. 3/3/2/2; 7 témánál minden témából legalább 1, a maradék 3 véletlenszerűen, egy témából legfeljebb 2; **10 témánál minden témából pontosan 1**), **20 perc** időkorlát az egész tesztre (nem feladatonként – ezt ki is írja).
 - Minden feladat végén: „Eredményként csak egyetlen számot adjon meg, pl. 8,2 (ha 8,2 %-ot szeretne beírni).”
 - Feladatok közt szabadon lehet lépkedni (bal oldali/felső sáv számokkal).
 - „Teszt beadása” → megerősítés → eredmény: pontszám, %, és feladatonként a helyes válasz + a megoldás levezetése.
@@ -427,6 +427,137 @@ A **kereslet–kínálat** feladat (PPT 16–20. dia) a dolgozatban nem szerepel
 **Ábra:** az eloszlás oszlopdiagramja SVG-n (x: nyeremény, magasság: valószínűség), a várható érték függőleges szaggatott vonallal.
 
 **„Kivetítés 100 játékra”** mint magyarázó elem: a V7 „Miért így?” szövege a 100-zal szemléltetést így használja („100 játékból kb. 16-szor nyerünk 20-at…”).
+
+---
+
+### Közös szabályok a v5 témáihoz (5.8–5.10)
+
+- Érvényes a 3.2, a 4. fejezet és a v4 közös szabályai („GeoGebrában így” doboz, SVG-ábra a megoldás után, tizedes**pont** a GeoGebra-sorokban).
+- **Új közös modul: `js/lib/eloszlas.js`** (függőség nélkül, tesztelve): binomiális és hipergeometrikus valószínűség (`pmf`, kumulált), várható érték, szórás, módusz; normális eloszlás `F(x)` (pl. erf-közelítés, abszolút hiba < 10⁻⁷) és inverze (`kvantilis(p, μ, σ)`, pl. Acklam-közelítés vagy felezés). A tesztek a SPEC-ben megadott ellenőrzött értékeket (4 tizedes) visszaadják.
+- A GeoGebra **Valószínűség-számítás** nézetét a hallgató ismeri: hamburger menü → Valószínűség-számítás; az eloszlás legördülőből (normális – binomiális – … – hipergeometrikus a lista alján); alul a gombok: **kisebb (≤)**, **két érték között**, **nagyobb (≥)**. A „GeoGebrában így” doboz ezt írja le lépésenként, a konkrét beírandó számokkal (pl. „Hipergeometrikus · populáció: 32 · n: 4 · minta: 8 · két érték között: 2 ≤ X ≤ 2”).
+- **Valószínűségek 4 tizedesre**, a munkafüzet szokása szerint; elfogadott a százalék is (21,49 % → 0,2149 megjegyzéssel), és ±0,0001 tűrés.
+
+### 5.8 Téma 8 – Mintavételek és eloszlásuk (hipergeometrikus, binomiális)  *(v5)*
+
+**Kulcsgondolat (kiemelve, piros keretben):**
+
+> **Visszatevés nélkül → hipergeometrikus:** N (sokaság), M (kitüntetettek száma – **darab**, nem %), n (minta).
+> **Visszatevéssel / független kísérletek → binomiális:** n (kísérletek száma), p (a kitüntetett **aránya** egy-egy húzásnál).
+> **Nagy sokaság, csak az arány ismert** (pl. „nagyon sok alkatrész, 8 % selejtes”) → **binomiálissal becsüljük** a visszatevés nélkülit is.
+
+**Elmélet röviden:**
+- Visszatevés nélkül: egyesével vagy egyszerre húzunk, a kihúzottat nem tesszük vissza – az arányok húzásról húzásra változhatnak. Visszatevéssel: mindig ugyanannyi elemből húzunk, minden húzásnál ugyanakkora az esély.
+- A klasszikus út (kombinációk): P(2 ász a 8 lap között) = C(4,2) · C(28,6) / C(32,8) = 2 260 440 / 10 518 300 = 0,2149 – a GeoGebra ugyanezt adja.
+- Binomiális képlet: P(X = k) = C(n,k) · pᵏ · (1 − p)ⁿ⁻ᵏ (a „sorrendi szorzó” a C(n,k)).
+- **Kitüntetett az, amiről a kérdés szól** (piros vagy sárga, fiú vagy lány – lánynál p = 0,55, ha a fiú 0,45).
+- **Diszkrét eloszlásnál nem mindegy a határ:** „k-nál több” → X ≥ k + 1; „k-nál kevesebb” → X ≤ k − 1; „legalább k” → X ≥ k; „legfeljebb k” → X ≤ k; „van (hibás)” → X ≥ 1.
+- **Pontjellemzők:** módusz = a legvalószínűbb érték (legmagasabb oszlop); várható érték (μ) – lehet tört (5,5)!; szórás (σ). Hipergeometrikus: μ = n·M/N; binomiális: μ = n·p, σ = √(n·p·(1 − p)).
+- „A várható értéktől legfeljebb t szórással tér el” → az [μ − tσ; μ + tσ] intervallumba eső **egész** értékek.
+
+**Kidolgozott példák (az eredeti PPT és munkafüzet, ellenőrzött értékek):**
+1. Kártya, 8 lap visszatevés nélkül (32 / 4 ász / 8): P(2 ász) = **0,2149**; módusz **1** (0,4503); pirosakra (32 / 8 / 8): μ = 2, P(X ≥ 3) = **0,3085**; σ = 1,0776 → 1 ≤ X ≤ 3: **0,8478**.
+2. Tulipán: 30 hagyma, 40 % sárga → **12 sárga**, 18 piros; 10-et ültetünk: 5 sárga **0,2259**; piros módusz 6, P(X ≥ 7) = **0,35**; piros μ = 6, P(X ≤ 5) = **0,3441**; sárga μ = 4, σ = 1,2865 → 3–5: **0,7647**.
+3. Tételhúzás: 18 tétel, 14 megtanult, 3-at húz, legalább 2 → **0,8922**; csak 10 megtanult → **0,5882**.
+4. Kártya visszatevéssel: p = 0,25; 5 húzás, 3 piros **0,0879**; 8 húzás, **legfeljebb** 3 piros **0,8862**; ász p = 0,125, 12 húzás, módusz 1, P(X ≥ 2) = **0,4533**; 16 húzás: μ = 2, σ = 1,3229 → 0–4: **0,9593**.
+5. Születés (fiú 45 %): 4 gyermek, fiú is, lány is (1–3 fiú) **0,8675**; 5 gyermek, több fiú (3–5) **0,4069**; 10 gyermek, lány p = 0,55, μ = 5,5, P(X ≥ 6) = **0,5044**; 8 gyermek, nincs lány **0,0017**.
+6. Boríték: 100, ebből 24 nyerő, 8-at húzunk, 2 nyerő: visszatevés nélkül **0,3242**, visszatevéssel **0,3108** – szinte azonos; 25 borítéknál (6 nyerő) visszatevés nélkül **0,3763** – már nagyobb az eltérés.
+7. Selejt (8 %, nagyon sok alkatrész, binomiális): 20-ból van hibás **0,8113**; 15-ből legfeljebb 1 **0,6597**; 10-ből módusz 0 (**0,4344**); 25-ből μ = 2, σ = 1,3565 → 0–4: **0,9549**.
+8. További munkafüzet-feladatok: bonbon (12 / 5 mogyorós / 3): módusz 1 (0,4773); kávés (12 / 7 / 3) μ = 1,75, P(X ≤ 1) = 0,3636, csak kávés 0,1591 · facebook (40 %): 32-ből legalább 16: 0,1648; 30-ból μ = 12, P(X ≥ 14) = 0,2855; 25-ből módusz 10, P(X ≤ 8) = 0,2735 · mentők (15 % indokolatlan): 30-ból 3–5: 0,5592; 20-ból μ = 3, P(X ≤ 2) = 0,4049; 24 hívásból az indokolt (p = 0,85) módusza 21 (0,2251) · tojás (10 % régi): 6-ból csak friss 0,5314; 10-ből legalább 2 régi 0,2639; 15-ből 2 régi, 4-et veszünk, van régi (hipergeom.) 0,4762; 20-ból 3 régi, 6-ot veszünk, legfeljebb 1 régi 0,7982.
+
+**Feladattípusok és tipikus hibák:**
+
+| Típus | Feladat | Helyes | Tipikus hibás válasz → visszajelzés |
+|---|---|---|---|
+| M1 melyik eloszlás? (választós) | rövid szöveg → hipergeometrikus / binomiális (+ paraméterek kiválasztása) | lásd kulcsgondolat | „nagyon sok alkatrész” → hipergeometrikus → „Nem ismerjük a sokaság méretét – nagy sokaságnál binomiálissal becsülünk.” |
+| M2 hipergeometrikus, pontos érték | N, M, n, k → P(X = k) | képlet | a binomiális értéke (arányból) → „Visszatevés nélkül húzunk és ismert a sokaság → hipergeometrikus.”; M helyett % (pl. 40) → „Darabszám kell: a 30 hagyma 40 %-a = 12.” |
+| M3 hipergeometrikus, intervallum | „több mint / kevesebb mint / legalább / legfeljebb k” | a megfelelő összeg | a határ beleértése („több mint 2” → ≥ 2) → „A 2-nél több a 3-mal kezdődik.” (ellenpróba: a hallgató értéke = P(X ≥ 2)) |
+| M4 módusz és valószínűsége | két mező | max pₖ | a várható érték megadása (ha eltér) → „A módusz a legvalószínűbb érték, a legmagasabb oszlop.” |
+| M5 várható érték, szórás | két mező (4 tizedes) | μ, σ | σ helyett σ² → „Ez a szórásnégyzet, gyököt kell vonni.” |
+| M6 „legfeljebb t szórással tér el” | μ, σ → az egész határok → P | [μ − tσ; μ + tσ] egészei | nem egészre kerekített határ / rossz irányú kerekítés → „0,92-nél nagyobb első egész az 1.” |
+| M7 binomiális, pontos / intervallum | n, p (vagy arány: 8/32) → P | képlet | p helyett darabszám (8 vagy 24) → „Egy-egy húzásnál az esély: 24/100 = 0,24.”; „legfeljebb” ↔ „legalább” csere → „Olvassa el még egyszer: legfeljebb 3 = 0, 1, 2 vagy 3.” |
+| M8 kitüntetett csere | fiú 45 % → lányokról kérdez | p = 0,55 | 0,45-tel számol → „A lány születésének esélye 1 − 0,45 = 0,55.” |
+| M9 összehasonlítás | ugyanaz a helyzet visszatevéssel és nélküle (két mező) + „mikor közelebb?” (választós) | két érték | — (a magyarázat: N, M ≫ n esetén mindegy) |
+
+**Számtartományok:** N 10–200, M és n úgy, hogy n < N, M < N; binomiálisnál n 3–30, p 0,05–0,6 (két tizedes vagy egyszerű tört, pl. 8/32). Valószínűség 4 tizedes, μ és σ 4 tizedes (ha egész, egész).
+
+**Ábra:** oszlopdiagram (x = 0…n, magasság = P), a kérdezett oszlopok kiszínezve – ahogy a GeoGebra mutatja –, μ szaggatott függőleges vonallal. Az M3/M6 visszajelzésénél a hallgató által (rosszul) beleértett oszlop más színnel.
+
+### 5.9 Téma 9 – Normális eloszlás  *(v5)*
+
+**Kulcsgondolat (kiemelve):**
+
+> **Normális eloszlás = szimmetrikus harang**, két paramétere: **μ (várható érték, a csúcs helye)** és **σ (szórás)**.
+> A valószínűség a görbe alatti **terület**. Egy konkrét érték valószínűsége **0** → **mindegy, hogy < vagy ≤**.
+> μ ± 1σ: ≈ 68 %, μ ± 2σ: ≈ 95 %.
+
+**Elmélet röviden:**
+- Folytonos változó: egy intervallumon bármilyen értéket felvehet (tömeg, térfogat, idő). Szemléltetés: dinnyék ládákba válogatva → hisztogram → sűrűségfüggvény; a teljes terület 1.
+- Alkalmazás: méretingadozás gyártásban (töltőgép, csoki), bevétel, magasság, tömeg.
+- A szimmetria miatt az átlagnál kisebb és nagyobb értékek aránya 50–50 %.
+- **Kérdéstípusok:** kisebb / nagyobb / két érték közé esik; „eltér az átlagtól legfeljebb d-vel / t szórással” (μ ± d); „több mint d-vel tér el” (1 − a középső rész); **fordított**: adott a valószínűség, a határ a kérdés (a valószínűséget beírjuk); **szimmetrikus intervallum** p %-hoz: kimarad (1 − p), ennek fele alul, fele felül.
+- Diszkrét eloszlásnál (8. téma) a határ beleértése számít, itt nem.
+
+**Kidolgozott példák (ellenőrzött):**
+1. Paradicsom N(160; 10): < 160 g: **50 %**; > 175 g: **6,68 %**; ±1,85σ (141,5–178,5): **93,57 %**; több mint 12 g-mal tér el: **23,01 %**; a 90 % nagyobb, mint **147,18 g**; a 35 % kisebb, mint **156,15 g**; 80 % szimmetrikus: **147,2–172,8 g**.
+2. Ásványvíz N(200; 5): > 198: **0,6554**; < 201: **0,5793**; pontosan 200: **0**; 195–205: **0,6827**; több mint 2σ eltérés: **0,0455**.
+3. Balaton szelet N(25; 1,5): > 24: **0,7475**; 23–27: **0,8176**; a 90 % kisebb, mint **26,92 g**; a 40 % nagyobb, mint **25,38 g**.
+4. Narancslé N(20; 0,5): ±1,8σ (19,1–20,9): **0,9281**; a 70 % kevesebb, mint **20,26 dl**; a 90 % több, mint **19,36 dl**; 95 % szimmetrikus **19,02–20,98** (≈ 1,96σ); 98 % **18,84–21,16** (≈ 2,33σ).
+5. Vízfogyasztás N(1; 0,3): 0,8–1,2: **0,4950**; ±0,1: **0,2611**; 90 % szimmetrikus **0,507–1,493**; 96 % **0,384–1,616** (≈ 2,054σ).
+6. Alma N(28; 8): több mint 10 dkg-mal tér el **0,2113**; kevesebb mint 1,7σ-val **0,9109**; több mint 1,5σ-val **0,1336**.
+
+**Feladattípusok és tipikus hibák:**
+
+| Típus | Feladat | Helyes | Tipikus hibás válasz → visszajelzés |
+|---|---|---|---|
+| N1 kisebb / nagyobb | μ, σ, a → P(X < a) vagy P(X > a) | F(a), 1 − F(a) | a komplementer → „Nagyobb értékeket kérdez: 1 − F(a). Becsüljön: a > μ esetén 50 %-nál kevesebb.” |
+| N2 két érték között | a, b → F(b) − F(a) | | csak F(b) → „A b alatti részből le kell vonni az a alattit.” |
+| N3 eltérés az átlagtól (legfeljebb) | „legfeljebb d-vel / t szórással” → μ ± d | F(μ+d) − F(μ−d) | t·σ helyett t-vel számol (pl. ±1,8 a ±0,9 helyett) → „Előbb számolja ki: 1,8 · 0,5 = 0,9.” |
+| N4 eltérés az átlagtól (több mint) | „több mint d-vel tér el” | 1 − (F(μ+d) − F(μ−d)) | a középső rész → „Ez a legfeljebb d eltérés; a kérdés a két szélső rész.” |
+| N5 pontos érték | „pontosan a” | 0 | bármi más → „Folytonos változónál egy konkrét érték valószínűsége 0.” |
+| N6 fordított: kisebb | „a … %-a kisebb, mint?” → x | kvantilis(p) | kvantilis(1 − p) (rossz irány) → „Kisebb értékekről van szó: a kisebb gombnál írja be a valószínűséget.” |
+| N7 fordított: nagyobb | „a … %-a nagyobb / többet tartalmaz, mint?” | kvantilis(1 − p) | kvantilis(p) |
+| N8 szimmetrikus intervallum | p → alsó és felső határ (két mező, 2 tizedes) + „hány szórás?” | kvantilis((1−p)/2), kvantilis((1+p)/2) | (1 − p)-vel számol egy oldalon (pl. 5 % alul a 2,5 % helyett) → „A kimaradó rész fele alul, fele felül.” |
+| N9 becslés (választós) | „50 %-nál több vagy kevesebb?”, „szélesebb vagy szűkebb lesz az intervallum?” | | — |
+
+**Számtartományok:** μ, σ „kerek” (pl. 200 / 5, 25 / 1,5, 1 / 0,3); határok μ ± (0,2…2,5)σ; valószínűség 4 tizedes, határok 2 (vagy a feladatban megadott) tizedes, ±0,01 tűrés a határokra (a munkafüzet is így fogad el).
+
+**Ábra:** a harang SVG-n, a kérdezett terület kiszínezve, μ és a határok feliratozva (a szimmetrikus kérdésnél a két kimaradó „fecni” más színnel) – így látszik, ha a színezés nem szimmetrikus.
+
+A **mintavétellel kombinált** típus (pl. „6 paradicsom közül legfeljebb 2 nehezebb 165 g-nál”) a vizsgán nem szerepel – **ne** kerüljön be.
+
+### 5.10 Téma 10 – Döntéselmélet  *(v5)*
+
+**Kulcsgondolat (kiemelve):** egy **döntési táblázat** (sorok: döntések, oszlopok: körülmények, cellák: nyereség), és **elvenként** más döntés születhet.
+
+| Elv | Mit csinálunk? |
+|---|---|
+| Optimista (maximax) | soronként a **maximum**, ezek közül a legnagyobb |
+| Pesszimista | soronként a **minimum**, ezek közül a legnagyobb („a legrosszabbakból a legkevésbé rosszat”) |
+| Elmulasztott nyereség | oszloponként: oszlopmaximum − érték; soronként a legnagyobb elmaradás; ezek közül a **legkisebb** |
+| Laplace | soronként **számtani átlag**, a legnagyobb |
+| Bayes | soronként **várható érték** a megadott valószínűségekkel (a hiányzót 100 %-ra egészítjük ki), a legnagyobb |
+| Hurwitz (α) | soronként **α · max + (1 − α) · min**, a legnagyobb |
+
+**Elmélet röviden:** a hallgatók józan ésszel is kitalálják az elveket (vitával érdemes kezdeni). Az optimista nem vizsgaanyag (a gyakorlóban szerepelhet, de a próbatesztben ne). A Bayes a legracionálisabb, ha ismertek a gyakoriságok. Holtversenynél a válasz „X vagy Y”. A Hurwitz-elv α-tól való függése (grafikon) nem vizsgaanyag.
+
+**Kidolgozott példák (ellenőrzött):**
+1. Gabona (millió Ft; napos / átlagos / esős): napraforgó 20 / 1 / −6; búza 9 / 8 / 0; lucerna 4 / 4 / 4; rizs 3 / 6 / 8 → optimista **napraforgó**; pesszimista **lucerna**; elmulasztott nyereség (14 · 11 · 16 · 17) **búza**; Laplace (5 · 17/3 · 4 · 17/3) **búza vagy rizs**; Bayes 50/30/20 % (9,1 · 6,9 · 4 · 4,9) **napraforgó**; Hurwitz α = 0,2 (−0,8 · 1,8 · 4 · 4) **lucerna vagy rizs**.
+2. Kertes gazda (ezer Ft; fagyos / átlagos / napos): saláta 50 / 250 / 330; borsó 120 / 200 / 300; retek 80 / 160 / 200; paradicsom 20 / 220 / 450 → pesszimista **borsó** (120); optimista **paradicsom** (450); Laplace **paradicsom** (230); Bayes 20/45/35 % (238 · 219 · 158 · 260,5) **paradicsom**; elmulasztott nyereség (120 · 150 · 250 · 100) **paradicsom**; Hurwitz α = 0,3 (134 · 174 · 116 · 149) **borsó**.
+
+**Feladattípusok és tipikus hibák** (a gyakorló generált táblázatokkal: 3–4 döntés × 3 körülmény, egész számok −10…30 vagy 0…500 között; a válasz a döntés neve (választós, „X vagy Y” holtversenynél) **és** a döntő érték (szám)):
+
+| Típus | Feladat | Tipikus hibás válasz → visszajelzés |
+|---|---|---|
+| D1 optimista | max-ok max-a | — |
+| D2 pesszimista | min-ek max-a | a min-ek min-ja („a legrosszabbak közül a legrosszabb”) → „Pesszimista, de nem buta: a legrosszabbak közül a legkevésbé rosszat választja.” |
+| D3 elmulasztott nyereség – táblázat | a veszteségtábla egy-egy cellája (szám) | negatív értéknél rossz különbség (8 − (−6) = 2) → „8 − (−6) = 14.”; soronként számol oszlop helyett → „Oszloponként keressük, melyik lett volna a legjobb.” |
+| D4 elmulasztott nyereség – döntés | a max-elmaradások minimuma | a max-elmaradások maximuma → „Ezek veszteségek: a legkisebbet választjuk.” |
+| D5 Laplace | átlag | összeg (döntés ugyanaz, de az érték nem) → „Az összeget osztani kell a körülmények számával.” |
+| D6 Bayes | várható érték; a hiányzó valószínűség kiegészítése | hiányzó valószínűség = 0 → „A valószínűségek összege 1 (100 %).” |
+| D7 Hurwitz | α · max + (1 − α) · min | a max/min helyett az első és utolsó oszlop (pl. a rizsnél a legjobb az utolsó oszlopban) → „A sor legnagyobb és legkisebb értékét vegye, bárhol vannak.”; α és 1 − α felcserélése |
+| D8 „melyik elv?” (választós) | rövid leírás → elv neve | — |
+
+**Ábra:** a döntési táblázat HTML-táblázatként, a megoldásban a felhasznált értékek (soronkénti max/min/átlag) kiemelve, a választott sor kiemelve.
 
 ## 6. Megjelenés
 
